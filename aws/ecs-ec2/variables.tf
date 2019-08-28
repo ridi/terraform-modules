@@ -26,6 +26,11 @@ variable "alb_container_port" {
   default     = 80
 }
 
+variable "iam_exec_role_arn" {
+  description = "ARN of IAM role to execute this task"
+  default     = null
+}
+
 variable "container_definitions" {
   description = "Definitions of each container. (See https://docs.aws.amazon.com/ko_kr/AmazonECS/latest/developerguide/create-task-definition.html)"
   type        = list(map(string))

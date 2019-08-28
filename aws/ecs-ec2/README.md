@@ -6,6 +6,7 @@
 - `alb_target_group_name` - Name of ALB target group. if doesn't use ALB, set this null
 - `alb_container_name` - Name of container bound to ALB target group
 - `alb_container_port` - Port of container bound to ALB target group
+- 'iam_exec_role_arn' - ARN of IAM role to execute this task
 - `container_definitions` - Definitions of each container. (See https://docs.aws.amazon.com/ko_kr/AmazonECS/latest/developerguide/create-task-definition.html)
 - `task_num` - Number of tasks to be deployed
 - `deployment_min_percent` - Lower limit of tasks as a percentage
