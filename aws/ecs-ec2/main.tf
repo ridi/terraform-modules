@@ -34,5 +34,5 @@ resource "aws_ecs_task_definition" "this" {
 
   execution_role_arn = var.iam_exec_role_arn
 
-  container_definitions = jsonencode([var.container_definitions])
+  container_definitions = jsonencode(var.container_definitions)
 }
