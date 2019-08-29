@@ -33,7 +33,7 @@ variable "iam_exec_role_arn" {
 
 variable "container_definitions" {
   description = "Definitions of each container. (See https://docs.aws.amazon.com/ko_kr/AmazonECS/latest/developerguide/create-task-definition.html)"
-  type        = list(any)
+  type        = any
 }
 
 variable "task_num" {
