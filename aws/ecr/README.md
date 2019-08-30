@@ -1,7 +1,4 @@
-# terraform module ecr
-
-## Input Variables
-- `repo_name` - Name of ECR repository
+# ecr
 
 ## Usage
 ```hcl
@@ -11,6 +8,9 @@ module "foo" {
   repo_name = "my-awesome-repo"
 }
 ```
+
+## Input Variables
+- `repo_name` - Name of ECR repository
 
 ## Outputs
 - `repo_url` - The url of ECR repository
