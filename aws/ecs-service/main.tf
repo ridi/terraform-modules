@@ -5,7 +5,7 @@ data "aws_lb_target_group" "this" {
 
 resource "aws_ecs_service" "this" {
   name            = var.service_name
-  launch_type     = "EC2"
+  launch_type     = var.launch_type
   cluster         = var.cluster_name
   task_definition = aws_ecs_task_definition.this.arn
 
@@ -13,9 +13,23 @@ resource "aws_ecs_service" "this" {
   deployment_minimum_healthy_percent = var.deployment_min_percent
   deployment_maximum_percent         = var.deployment_max_percent
 
-  ordered_placement_strategy {
-    type  = "spread"
-    field = "attribute:ecs.availability-zone"
+  dynamic ordered_placement_strategy {
+    for_each = var.launch_type == "FARGATE" ? [] : ["attribute:ecs.availability-zone"]
+
+    content {
+      type  = "spread"
+      field = ordered_placement_strategy.value
+    }
+  }
+
+  dynamic "network_configuration" {
+    for_each = var.task_network_mode != "awsvpc" ? [] : [var.awsvpc_subnet_ids]
+
+    content {
+      subnets          = network_configuration.value
+      security_groups  = var.awsvpc_security_groups
+      assign_public_ip = var.awsvpc_assign_public_ip
+    }
   }
 
   dynamic "load_balancer" {
@@ -33,6 +47,11 @@ resource "aws_ecs_task_definition" "this" {
   family = var.service_name
 
   execution_role_arn = var.iam_exec_role_arn
+
+  requires_compatibilities = var.launch_type == "FARGATE" ? ["FARGATE"] : null
+  cpu                      = var.task_cpu
+  memory                   = var.task_memory
+  network_mode             = var.task_network_mode
 
   container_definitions = jsonencode(var.container_definitions)
 }

@@ -1,32 +1,28 @@
-# ecs-ec2
+# ecs-service
 
 ## Usage
 ```hcl
-data "aws_ecr_repository" "api" {
-  name = "my-ecr-repo"
-}
-
-resource "aws_cloudwatch_log_group" "api" {
-  name              = "/ecs/my-cluster/my-service"
-  retention_in_days = 7
-}
-
-module "api" {
+module "service" {
   source = "github.com/ridi/terraform-modules//aws/ecs-service"
   
   cluster_name = "my-cluster"
   service_name = "my-service"
         
   alb_target_group_name = "my-alb"
-  alb_container_name = "app"
-  alb_container_port = 80
+  alb_container_name    = "app"
+  alb_container_port    = 80
+  
+  # If runs with EC2 mode, ignore belows.
+  launch_type            = "FARGATE"
+  awsvpc_subnet_ids      = data.aws_subnet_ids.private.ids
+  awsvpc_security_groups = ["sg-1234abcd"]
   
   container_definitions = [
     {
       name  = "app",
-      image = "${data.aws_ecr_repository.api.repository_url}:1.0",
+      image = "my-repo/my-image:1.0",
       portMappings = [
-        { hostPort = 0, containerPort = 80 }
+        { containerPort = 80 }
       ],
       environment = [
         { name = "FOO", value = "This is FOO" },
@@ -46,7 +42,7 @@ module "api" {
         logDriver = "awslogs",
         options = {
           awslogs-region        = "ap-northeast-2",
-          awslogs-group         = aws_cloudwatch_log_group.api.name,
+          awslogs-group         = "/ecs/my-cluster/my-service"
           awslogs-stream-prefix = "1.0"
         }
       },
