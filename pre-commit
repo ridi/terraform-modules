@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -e
+
+dirs=$(git diff --cached --name-only --diff-filter=d -- '*.tf' | xargs -I X dirname X | uniq)
+
+for d in ${dirs}
+do
+    if ! (cd ${d} && terraform validate)
+    then
+        echo "Error: 'terraform validate' failed on ${d}" >&2
+        exit 1
+    fi
+
+    if ! terraform fmt -check=true ${d}
+    then
+        echo "Error: 'terraform fmt' failed on ${d}" >&2
+        exit 1
+    fi
+done
