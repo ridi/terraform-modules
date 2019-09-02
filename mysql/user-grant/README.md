@@ -3,6 +3,8 @@
 ## Usage
 ```hcl
 module user1_localhost {
+  source = "github.com/ridi/terraform-modules//mysql/user-grant"
+
   user     = "user1@localhost"
   password = "user1secret"
   
@@ -18,6 +20,8 @@ module user1_localhost {
 }
 
 module user1_remote {
+  source = "github.com/ridi/terraform-modules//mysql/user-grant"
+  
   user     = "user1@10.0.%"
   password = "user1secret"
   
