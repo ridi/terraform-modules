@@ -1,4 +1,6 @@
 locals {
+  requires_compatibilities = var.launch_type == "FARGATE" ? ["FARGATE"] : []
+
   task_cpu          = var.task_cpu == null ? (var.launch_type == "FARGATE" ? 256 : null) : var.task_cpu
   task_memory       = var.task_memory == null ? (var.launch_type == "FARGATE" ? 512 : null) : var.task_memory
   task_network_mode = var.task_network_mode == null ? (var.launch_type == "FARGATE" ? "awsvpc" : null) : var.task_network_mode
@@ -58,7 +60,7 @@ resource "aws_ecs_task_definition" "this" {
 
   execution_role_arn = var.iam_exec_role_arn
 
-  requires_compatibilities = var.launch_type == "FARGATE" ? ["FARGATE"] : null
+  requires_compatibilities = local.requires_compatibilities
   cpu                      = local.task_cpu
   memory                   = local.task_memory
   network_mode             = local.task_network_mode
