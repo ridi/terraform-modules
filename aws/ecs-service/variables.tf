@@ -8,6 +8,48 @@ variable "service_name" {
   type        = string
 }
 
+variable "launch_type" {
+  description = "The launch type on which to run your service. ('EC2' or 'FARGATE')"
+  type        = string
+  default     = "EC2"
+}
+
+variable "task_cpu" {
+  description = "The number of cpu units used by the task. (used in Fargate)"
+  type        = number
+  default     = null
+}
+
+variable "task_memory" {
+  description = "The amount (in MB) of memory used by the task. (used in Fargate)"
+  type        = number
+  default     = null
+}
+
+variable "task_network_mode" {
+  description = "The Docker networking mode to use for the containers in the task. ('none', 'bridge', 'awsvpc', 'host')"
+  type        = string
+  default     = null
+}
+
+variable "awsvpc_subnet_ids" {
+  description = "The subnets associated with the task or service (task_network_mode)"
+  type        = list(string)
+  default     = null
+}
+
+variable "awsvpc_security_groups" {
+  description = "The security groups associated with the task or service"
+  type        = list(string)
+  default     = null
+}
+
+variable "awsvpc_assign_public_ip" {
+  description = "Whether assigns a public IP address to the ENI or not"
+  type        = bool
+  default     = null
+}
+
 variable "alb_target_group_name" {
   description = "Name of ALB target group. if doesn't use ALB, set this null"
   type        = string
