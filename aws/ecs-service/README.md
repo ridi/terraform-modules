@@ -12,7 +12,7 @@ module "service" {
   alb_container_name    = "app"
   alb_container_port    = 80
   
-  # If runs with EC2 mode, ignore belows.
+  # If you runs with EC2 type instead Fargate, ignore belows (launch_type, awsvpc_*).
   launch_type            = "FARGATE"
   awsvpc_subnet_ids      = data.aws_subnet_ids.private.ids
   awsvpc_security_groups = ["sg-1234abcd"]
@@ -56,13 +56,20 @@ module "service" {
 ```
 
 ## Input Variables
-- `cluster_name` - Name of ECS cluster to deploy this ECS service on
-- `service_name` - Name of this ECS service
-- `alb_target_group_name` - Name of ALB target group. if doesn't use ALB, set this null
-- `alb_container_name` - Name of container bound to ALB target group
-- `alb_container_port` - Port of container bound to ALB target group
-- 'iam_exec_role_arn' - ARN of IAM role to execute this task
-- `container_definitions` - Definitions of each container. (See https://docs.aws.amazon.com/ko_kr/AmazonECS/latest/developerguide/create-task-definition.html)
-- `task_num` - Number of tasks to be deployed
-- `deployment_min_percent` - Lower limit of tasks as a percentage
-- `deployment_max_percent` - Upper limit of tasks as a percentage
+- `cluster_name` - The name of ECS cluster to deploy this ECS service on
+- `service_name` - The name of this ECS service
+- `launch_type` - The launch type on which to run your service. ('EC2' or 'FARGATE')
+- `task_cpu` - The number of cpu units used by the task. (used in Fargate)
+- `task_memory` - The amount (in MB) of memory used by the task. (used in Fargate)
+- `task_network_mode` - The Docker networking mode to use for the containers in the task. ('none', 'bridge', 'awsvpc', 'host')
+- `awsvpc_subnet_ids` - The subnets associated with the task or service (task_network_mode)
+- `awsvpc_security_groups` - The security groups associated with the task or service
+- `awsvpc_assign_public_ip` - Whether assigns a public IP address to the ENI or not
+- `alb_target_group_name` - The name of ALB target group. if doesn't use ALB, set this null
+- `alb_container_name` - The name of container bound to ALB target group
+- `alb_container_port` - The port of container bound to ALB target group
+- `iam_exec_role_arn` - ARN of IAM role to execute this task
+- `container_definitions` - The definitions of each container. (See https://docs.aws.amazon.com/ko_kr/AmazonECS/latest/developerguide/create-task-definition.html)
+- `task_num` - The number of tasks to be deployed
+- `deployment_min_percent` - The lower limit of tasks as a percentage
+- `deployment_max_percent` - The upper limit of tasks as a percentage

@@ -17,37 +17,37 @@ variable "launch_type" {
 variable "task_cpu" {
   description = "The number of cpu units used by the task. (used in Fargate)"
   type        = number
-  default     = var.launch_type == "FARGATE" ? 256 : null
+  default     = null
 }
 
 variable "task_memory" {
   description = "The amount (in MB) of memory used by the task. (used in Fargate)"
   type        = number
-  default     = var.launch_type == "FARGATE" ? 512 : null
+  default     = null
 }
 
 variable "task_network_mode" {
   description = "The Docker networking mode to use for the containers in the task. ('none', 'bridge', 'awsvpc', 'host')"
   type        = string
-  default     = var.launch_type == "FARGATE" ? "awsvpc" : null
+  default     = null
 }
 
 variable "awsvpc_subnet_ids" {
   description = "The subnets associated with the task or service (task_network_mode)"
   type        = list(string)
-  default     = var.task_network_mode == "awsvpc" ? [] : null
+  default     = null
 }
 
 variable "awsvpc_security_groups" {
   description = "The security groups associated with the task or service"
   type        = list(string)
-  default     = var.task_network_mode == "awsvpc" ? [] : null
+  default     = null
 }
 
 variable "awsvpc_assign_public_ip" {
   description = "Whether assigns a public IP address to the ENI or not"
   type        = bool
-  default     = var.task_network_mode == "awsvpc" ? false : null
+  default     = null
 }
 
 variable "alb_target_group_name" {
