@@ -1,0 +1,38 @@
+# user-grant
+
+## Usage
+```hcl
+module user1_localhost {
+  user     = "user1@localhost"
+  password = "user1secret"
+  
+  grants = {
+    database_a = {
+      "*" = ["SELECT"]
+    },
+    database_b = {
+      tb_foo = ["SELECT", "INSERT", "UPDATE", "DELETE"]
+      tb_bar = ["SELECT", "INSERT", "UPDATE", "DELETE"]
+    }
+  }
+}
+
+module user1_remote {
+  user     = "user1@10.0.%"
+  password = "user1secret"
+  
+  grants = {
+    database_a = {
+      "*" = ["SELECT"]
+    },
+    database_b = {
+      tb_foo = ["SELECT"]
+      tb_bar = ["SELECT"]
+    }
+  }
+}
+```
+## Input Variables
+- `user`: The MySQL account in form of YOUR_ID@HOST. if no '@' character exists, use 'losthost' as default
+- `password`: The password of user
+- `grants`: The grants map for each databases and tables.

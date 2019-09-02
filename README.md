@@ -6,3 +6,6 @@
 - [ecs-service](aws/ecs-service)
 - [iam-group](aws/iam-group)
 - [iam-user](aws/iam-user)
+
+## MySQL
+- [user-grant](mysql/user-grant)
