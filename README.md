@@ -1,5 +1,8 @@
 # terraform-modules
 
+## Prerequisites
+The modules were implemented with latest Terraform syntax. The minimum Terraform version allowed is 0.12.0.
+
 ## AWS
 - [ecr](aws/ecr)
 - [ecs-autoscailing-cluster](aws/ecs-autoscailing-cluster)
