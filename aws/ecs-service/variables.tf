@@ -1,5 +1,5 @@
 variable "cluster_name" {
-  description = "Name of ECS cluster to deploy this ECS service on"
+  description = "Name of ECS cluster to deploy ECS service on"
   type        = string
 }
 
@@ -12,6 +12,12 @@ variable "launch_type" {
   description = "The launch type on which to run your service. ('EC2' or 'FARGATE')"
   type        = string
   default     = "EC2"
+}
+
+variable "task_definition_arn" {
+  description = "The arn of task definition. If not set, creates new one. (container_definitions is required)"
+  type        = string
+  default     = null
 }
 
 variable "task_cpu" {
@@ -69,7 +75,12 @@ variable "alb_container_port" {
 }
 
 variable "iam_exec_role_arn" {
-  description = "ARN of IAM role to execute this task"
+  description = "ARN of IAM role to execute ECS task"
+  default     = null
+}
+
+variable "iam_task_role_arn" {
+  description = "ARN of IAM role of ECS task"
   default     = null
 }
 

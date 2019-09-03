@@ -19,7 +19,7 @@ resource "aws_ecs_service" "this" {
   name            = var.service_name
   launch_type     = var.launch_type
   cluster         = var.cluster_name
-  task_definition = aws_ecs_task_definition.this.arn
+  task_definition = var.task_definition_arn == null ? aws_ecs_task_definition.this.*.arn[0] : var.task_definition_arn
 
   desired_count                      = var.task_num
   deployment_minimum_healthy_percent = var.deployment_min_percent
@@ -56,9 +56,12 @@ resource "aws_ecs_service" "this" {
 }
 
 resource "aws_ecs_task_definition" "this" {
+  count = var.task_definition_arn == null ? 1 : 0
+
   family = var.service_name
 
   execution_role_arn = var.iam_exec_role_arn
+  task_role_arn      = var.iam_task_role_arn
 
   requires_compatibilities = local.requires_compatibilities
   cpu                      = local.task_cpu
