@@ -37,6 +37,6 @@ module user1_remote {
 }
 ```
 ## Input Variables
-- `user`: The MySQL account in form of YOUR_ID@HOST. if no '@' character exists, use 'losthost' as default
-- `password`: The password of user
-- `grants`: The grants map for each databases and tables.
+- `user`: The MySQL account in form of MYSQL_ID@HOST. if no '@' character exists, the host is 'losthost'
+- `password`: The password of the account
+- `grants`: The grants map for each databases and tables
