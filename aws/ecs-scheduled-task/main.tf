@@ -10,22 +10,6 @@ locals {
   awsvpc_assign_public_ip = var.awsvpc_assign_public_ip == null ? (local.task_network_mode == "awsvpc" ? false : null) : var.awsvpc_assign_public_ip
 }
 
-resource "aws_ecs_task_definition" "this" {
-  count = var.task_definition_arn == null ? 1 : 0
-
-  family = var.name
-
-  execution_role_arn = var.iam_exec_role_arn
-  task_role_arn      = var.iam_task_role_arn
-
-  requires_compatibilities = local.requires_compatibilities
-  cpu                      = local.task_cpu
-  memory                   = local.task_memory
-  network_mode             = local.task_network_mode
-
-  container_definitions = jsonencode(var.container_definitions)
-}
-
 resource "aws_cloudwatch_event_rule" "this" {
   name                = var.name
   description         = var.description
@@ -54,4 +38,20 @@ resource "aws_cloudwatch_event_target" "this" {
   input = var.container_overrides == null ? null : jsonencode({
     containerOverrides = var.container_overrides
   })
+}
+
+resource "aws_ecs_task_definition" "this" {
+  count = var.task_definition_arn == null ? 1 : 0
+
+  family = var.name
+
+  execution_role_arn = var.iam_exec_role_arn
+  task_role_arn      = var.iam_task_role_arn
+
+  requires_compatibilities = local.requires_compatibilities
+  cpu                      = local.task_cpu
+  memory                   = local.task_memory
+  network_mode             = local.task_network_mode
+
+  container_definitions = jsonencode(var.container_definitions)
 }

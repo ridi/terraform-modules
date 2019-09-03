@@ -1,9 +1,3 @@
-variable "is_enabled" {
-  description = "Whether the rule should be enabled"
-  type        = bool
-  default     = true
-}
-
 variable "name" {
   description = "The name of the scheduling event rule and task definition (if new task is created)"
   type        = string
@@ -18,6 +12,12 @@ variable "description" {
 variable "schedule_expression" {
   description = "The scheduling expression. For example, cron(0 20 * * ? *) or rate(5 minutes)."
   type        = string
+}
+
+variable "is_enabled" {
+  description = "Whether the rule should be enabled"
+  type        = bool
+  default     = true
 }
 
 variable "cluster_arn" {

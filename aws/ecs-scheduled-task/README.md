@@ -53,23 +53,29 @@ module "scheduled_task" {
 ```
 
 ## Input Variables
-- `cluster_name` - The name of ECS cluster to deploy this ECS service on
-- `service_name` - The name of this ECS service
+
+### CloudWatch Event Rule
+- `name` - The name of the scheduling event rule and task definition (if new task is created)
+- `description` - The description of the scheduling event rule
+- `schedule_expression` - The scheduling expression. For example, "cron(0 20 * * ? *)" or "rate(5 minutes)".
+- `is_enabled` - Whether the rule should be enabled
+
+### CloudWatch Event Target
+- `cluster_arn` - The ARN of ECS cluster to deploy this ECS service on
 - `launch_type` - The launch type on which to run your service. ('EC2' or 'FARGATE')
-- `task_definition_arn` - The arn of task definition. If not set, creates new one. (container_definitions is required)
-- `task_cpu` - The number of cpu units used by the task. (used in Fargate)
-- `task_memory` - The amount (in MB) of memory used by the task. (used in Fargate)
-- `task_network_mode` - The Docker networking mode to use for the containers in the task. ('none', 'bridge', 'awsvpc', 'host')
+- `iam_event_role_arn` - The ARN of IAM role that is used for event target invocation
 - `awsvpc_subnet_ids` - The subnets associated with the task or service (task_network_mode)
 - `awsvpc_security_groups` - The security groups associated with the task or service
 - `awsvpc_assign_public_ip` - Whether assigns a public IP address to the ENI or not
-- `alb_target_group_name` - The name of ALB target group. if doesn't use ALB, set this null
-- `alb_container_name` - The name of container bound to ALB target group
-- `alb_container_port` - The port of container bound to ALB target group
-- `iam_event_role_arn` - The ARN of IAM role that is used for event target invocation
+- `task_definition_arn` - The arn of task definition. If not set, creates new one. (container_definitions is required)
+- `task_num` - The number of tasks to be deployed
+- `container_overrides` - The definition override of containers. `[{ name = 'name-of-container-to-override', 'key-to-override' = 'value', ... }, {...}]`
+
+### ECS Task Definition
+These variables are ignored if `task_definition_arn` is set
+- `task_cpu` - The number of cpu units used by the task. (used in Fargate)
+- `task_memory` - The amount (in MB) of memory used by the task. (used in Fargate)
+- `task_network_mode` - The Docker networking mode to use for the containers in the task. ('none', 'bridge', 'awsvpc', 'host')
 - `iam_task_role_arn` - The ARN of IAM role of ECS task
 - `iam_exec_role_arn` - ARN of IAM role to execute ECS task
 - `container_definitions` - The definitions of each container. (See https://docs.aws.amazon.com/ko_kr/AmazonECS/latest/developerguide/create-task-definition.html)
-- `task_num` - The number of tasks to be deployed
-- `deployment_min_percent` - The lower limit of tasks as a percentage
-- `deployment_max_percent` - The upper limit of tasks as a percentage
