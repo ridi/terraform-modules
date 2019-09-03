@@ -74,7 +74,7 @@ variable "awsvpc_assign_public_ip" {
 }
 
 variable "iam_event_role_arn" {
-  description = "The ARN of IAM role that is used for event target invocation"
+  description = "The ARN of IAM role that is used for event target invocation. If not set, creates new one"
   type        = string
   default     = null
 }
