@@ -56,10 +56,10 @@ module "cluster_my_service" {
   asg_max_size             = 4
   asg_desired_capacity     = 2
 
-  ec2_type   = "t3.micro"
-  ec2_ami_id = data.aws_ami.ecs.image_id
+  instance_type   = "t3.micro"
+  instance_ami_id = data.aws_ami.ecs.image_id
 
-  ec2_security_group_ids = [
+  instance_security_group_ids = [
     module.sg_my_service.this_security_group_id,
   ]
 }
@@ -68,7 +68,6 @@ module "cluster_my_service" {
 ## Input Variables
 
 ### Common
-- `create`: Whether to create this resources or not
 - `tags`: The tags to assign to all resources
 
 ### ECS Cluster
@@ -83,17 +82,20 @@ module "cluster_my_service" {
 - `asg_termination_policies`: The policies that choose which instance to terminate first
 
 ### EC2 Launch Configuration
-- `ec2_name`: The name tag attached to scaled instance
-- `ec2_ami_id`: The id of the AMI used for the autoscale instances
-- `ec2_timezone`: The timezone for the autocale instances
-- `ec2_locale`: The locale for the autocale instances
-- `ec2_type`: The autoscale instance type
-- `ec2_volume_size`: The total size of the autoscale instance volume in gigabytes (root block size(=8GB) + EBS block size)
-- `ec2_public_key`: The SSH public key for the autoscale instances
-- `ec2_security_group_ids`: The list of security group ids to associate with autoscale instances
-- `ec2_role_policy_arns`: The list of additional instance role policy arn
-- `ec2_enable_monitoring`: If true, autoscale instance will have detailed monitoring enabled
-- `ec2_user_data`: The init script for EC2
+- `instance_name`: The name tag attached to scaled instance
+- `instance_ami_id`: The id of the AMI used for the autoscale instances
+- `instance_timezone`: The timezone for the autocale instances
+- `instance_locale`: The locale for the autocale instances
+- `instance_type`: The autoscale instance type
+- `instance_volume_size`: The total size of the autoscale instance volume in gigabytes (root block size(=8GB) + EBS block size)
+- `instance_public_key`: The SSH public key for the autoscale instances
+- `instance_security_group_ids`: The list of security group ids to associate with autoscale instances
+- `instance_enable_monitoring`: If true, autoscale instance will have detailed monitoring enabled
+- `instance_user_data`: The init script for EC2
+
+### IAM
+- `iam_instance_profile`: The instance profile. If not set, creates new one
+- `iam_instance_role_policy_arns`: The list of additional instance role policys attached to newly created profile (ignored when iam_instance_profile is set)
 
 ### CloudWatch
 - `metrix_alarm_actions`: The actions of CloudWatch metrix alarm

@@ -1,9 +1,3 @@
-variable "create" {
-  description = "Whether to create this resources or not"
-  type        = bool
-  default     = true
-}
-
 variable "tags" {
   description = "The tags to assign to all resources"
   type        = map(string)
@@ -52,66 +46,71 @@ variable "asg_termination_policies" {
   default     = ["OldestInstance"]
 }
 
-variable "ec2_name" {
+variable "instance_name" {
   description = "The name tag attached to scaled instance"
   type        = string
   default     = null
 }
 
-variable "ec2_ami_id" {
+variable "instance_ami_id" {
   description = "The id of the AMI used for the autoscale instances"
   type        = string
   default     = null
 }
 
-variable "ec2_timezone" {
+variable "instance_timezone" {
   description = "The timezone for the autocale instances"
   type        = string
   default     = "Asia/Seoul"
 }
 
-variable "ec2_locale" {
+variable "instance_locale" {
   description = "The locale for the autocale instances"
   type        = string
   default     = "en_US.UTF-8"
 }
 
-variable "ec2_type" {
+variable "instance_type" {
   description = "The autoscale instance type"
   type        = string
   default     = "t2.micro"
 }
 
-variable "ec2_volume_size" {
+variable "instance_volume_size" {
   description = "The total size of the autoscale instance volume in gigabytes (root block size(=8GB) + EBS block size)"
   type        = number
   default     = 30
 }
 
-variable "ec2_security_group_ids" {
+variable "instance_security_group_ids" {
   description = "The list of security group ids to associate with autoscale instances"
   type        = list(string)
   default     = []
 }
 
-variable "ec2_role_policy_arns" {
-  description = "The list of additional instance role policy arn"
-  type        = list(string)
-  default     = []
-}
-
-variable "ec2_enable_monitoring" {
+variable "instance_enable_monitoring" {
   description = "If true, autoscale instance will have detailed monitoring enabled"
   default     = false
 }
 
-variable "ec2_user_data" {
+variable "instance_user_data" {
   description = "The init script for EC2"
   default     = null
 }
 
 variable "metrix_alarm_actions" {
   description = "The actions of CloudWatch metrix alarm"
+  type        = list(string)
+  default     = []
+}
+
+variable "iam_instance_profile" {
+  description = "The instance profile. If not set, creates new one"
+  default     = null
+}
+
+variable "iam_instance_role_policy_arns" {
+  description = "The list of additional instance role policys attached to newly created profile (ignored when instance_profile is not null)"
   type        = list(string)
   default     = []
 }

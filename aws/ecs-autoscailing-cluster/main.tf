@@ -23,7 +23,7 @@ resource "aws_autoscaling_group" "asg" {
   desired_capacity     = var.asg_desired_capacity
   termination_policies = var.asg_termination_policies
 
-  launch_configuration = aws_launch_configuration.ec2.name
+  launch_configuration = aws_launch_configuration.instance.name
 
   tags = concat(
     [for key, value in var.tags :
@@ -36,7 +36,7 @@ resource "aws_autoscaling_group" "asg" {
     [
       {
         key                 = "Name"
-        value               = var.ec2_name != null ? var.ec2_name : format("[autoscaled] %s", aws_ecs_cluster.cluster.name),
+        value               = var.instance_name != null ? var.instance_name : format("[autoscaled] %s", aws_ecs_cluster.cluster.name),
         propagate_at_launch = true
       },
     ]
@@ -50,22 +50,22 @@ resource "aws_autoscaling_group" "asg" {
 # ------------------------
 # EC2 Launch Configuration
 # ------------------------
-resource "aws_launch_configuration" "ec2" {
+resource "aws_launch_configuration" "instance" {
   name_prefix          = "${local.lc_name}-"
-  image_id             = var.ec2_ami_id
-  instance_type        = var.ec2_type
-  enable_monitoring    = var.ec2_enable_monitoring
-  security_groups      = var.ec2_security_group_ids
-  iam_instance_profile = aws_iam_instance_profile.ec2.name
+  image_id             = var.instance_ami_id
+  instance_type        = var.instance_type
+  enable_monitoring    = var.instance_enable_monitoring
+  security_groups      = var.instance_security_group_ids
+  iam_instance_profile = aws_iam_instance_profile.instance.*.name[0]
 
-  user_data_base64 = data.template_cloudinit_config.ec2.rendered
+  user_data_base64 = data.template_cloudinit_config.instance.rendered
 
   lifecycle {
     create_before_destroy = true
   }
 }
 
-data "template_cloudinit_config" "ec2" {
+data "template_cloudinit_config" "instance" {
   gzip          = true
   base64_encode = true
 
@@ -75,8 +75,8 @@ data "template_cloudinit_config" "ec2" {
     content = <<EOF
 #cloud-config
 # vim: syntax=yaml
-locale: ${var.ec2_locale}
-timezone: ${var.ec2_timezone}
+locale: ${var.instance_locale}
+timezone: ${var.instance_timezone}
 
 package_upgrade: true
 packages:
@@ -94,19 +94,23 @@ EOF
 
   part {
     content_type = "text/x-shellscript"
-    content = var.ec2_user_data == null ? "" : var.ec2_user_data
+    content = var.instance_user_data == null ? "" : var.instance_user_data
   }
 }
 
 # ------------------------
 # IAM Role for EC2
 # ------------------------
-resource "aws_iam_instance_profile" "ec2" {
-  name = aws_iam_role.ec2.name
-  role = aws_iam_role.ec2.name
+resource "aws_iam_instance_profile" "instance" {
+  count = var.iam_instance_profile == null ? 1 : 0
+
+  name = aws_iam_role.instance.*.name[0]
+  role = aws_iam_role.instance.*.name[0]
 }
 
-resource "aws_iam_role" "ec2" {
+resource "aws_iam_role" "instance" {
+  count = var.iam_instance_profile == null ? 1 : 0
+
   name = local.iam_role_name
   description = "Role for instances of ASG ${local.asg_name}"
 
@@ -124,15 +128,19 @@ resource "aws_iam_role" "ec2" {
   })
 }
 
-resource "aws_iam_role_policy_attachment" "ec2_ecs" {
-  role = aws_iam_role.ec2.name
+resource "aws_iam_role_policy_attachment" "instance_ecs" {
+  count = var.iam_instance_profile == null ? 1 : 0
+
+  role = aws_iam_role.instance.*.name[0]
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
 }
 
 # ------------------------
 # IAM Policy for SSM session manager
 # ------------------------
-resource "aws_iam_policy" "ec2_session" {
+resource "aws_iam_policy" "instance_session" {
+  count = var.iam_instance_profile == null ? 1 : 0
+
   name = local.ssm_policy_name
   policy = jsonencode({
     Version = "2012-10-17"
@@ -152,15 +160,17 @@ resource "aws_iam_policy" "ec2_session" {
   })
 }
 
-resource "aws_iam_role_policy_attachment" "ec2_session" {
-  role = aws_iam_role.ec2.name
-  policy_arn = aws_iam_policy.ec2_session.arn
+resource "aws_iam_role_policy_attachment" "instance_session" {
+  count = var.iam_instance_profile == null ? 1 : 0
+
+  role = aws_iam_role.instance.*.name[0]
+  policy_arn = aws_iam_policy.instance_session.*.arn[0]
 }
 
-resource "aws_iam_role_policy_attachment" "ec2_additional" {
-  count = var.create ? length(var.ec2_role_policy_arns) : 0
-  role = aws_iam_role.ec2.name
-  policy_arn = var.ec2_role_policy_arns[count.index]
+resource "aws_iam_role_policy_attachment" "instance_additional" {
+  count = var.iam_instance_profile == null ? length(var.iam_instance_role_policy_arns) : 0
+  role = aws_iam_role.instance.*.name[0]
+  policy_arn = var.iam_instance_role_policy_arns[count.index]
 }
 
 # ------------------------
