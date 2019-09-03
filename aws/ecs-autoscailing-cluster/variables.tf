@@ -110,7 +110,7 @@ variable "iam_instance_profile" {
 }
 
 variable "iam_instance_role_policy_arns" {
-  description = "The list of additional instance role policys attached to newly created profile (ignored when instance_profile is not null)"
+  description = "The list of additional instance role policys attached to newly created profile (ignored if iam_instance_profile is set)"
   type        = list(string)
   default     = []
 }

@@ -95,7 +95,7 @@ module "cluster_my_service" {
 
 ### IAM
 - `iam_instance_profile`: The instance profile. If not set, creates new one
-- `iam_instance_role_policy_arns`: The list of additional instance role policys attached to newly created profile (ignored when iam_instance_profile is set)
+- `iam_instance_role_policy_arns`: The list of additional instance role policys attached to newly created profile (ignored if iam_instance_profile is set)
 
 ### CloudWatch
 - `metrix_alarm_actions`: The actions of CloudWatch metrix alarm
