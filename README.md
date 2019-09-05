@@ -15,5 +15,8 @@ The modules were implemented with latest Terraform syntax. The minimum Terraform
 - [iam-group](aws/iam-group)
 - [iam-user](aws/iam-user)
 
+### SSM
+- [ssm-parameters](aws/ssm-parameters)
+
 ## MySQL
 - [user-grant](mysql/user-grant)
