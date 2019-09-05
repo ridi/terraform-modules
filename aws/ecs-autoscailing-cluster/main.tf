@@ -51,7 +51,8 @@ resource "aws_autoscaling_group" "asg" {
 # EC2 Launch Configuration
 # ------------------------
 resource "aws_launch_configuration" "instance" {
-  name_prefix          = "${local.lc_name}-"
+  name_prefix = "${local.lc_name}-"
+
   image_id             = var.instance_ami_id
   instance_type        = var.instance_type
   enable_monitoring    = var.instance_enable_monitoring
@@ -94,7 +95,7 @@ EOF
 
   part {
     content_type = "text/x-shellscript"
-    content = var.instance_user_data == null ? "" : var.instance_user_data
+    content      = var.instance_user_data == null ? "" : var.instance_user_data
   }
 }
 
@@ -111,7 +112,7 @@ resource "aws_iam_instance_profile" "instance" {
 resource "aws_iam_role" "instance" {
   count = var.iam_instance_profile == null ? 1 : 0
 
-  name = local.iam_role_name
+  name        = local.iam_role_name
   description = "Role for instances of ASG ${local.asg_name}"
 
   assume_role_policy = jsonencode({
@@ -131,7 +132,7 @@ resource "aws_iam_role" "instance" {
 resource "aws_iam_role_policy_attachment" "instance_ecs" {
   count = var.iam_instance_profile == null ? 1 : 0
 
-  role = aws_iam_role.instance.*.name[0]
+  role       = aws_iam_role.instance.*.name[0]
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
 }
 
@@ -163,13 +164,14 @@ resource "aws_iam_policy" "instance_session" {
 resource "aws_iam_role_policy_attachment" "instance_session" {
   count = var.iam_instance_profile == null ? 1 : 0
 
-  role = aws_iam_role.instance.*.name[0]
+  role       = aws_iam_role.instance.*.name[0]
   policy_arn = aws_iam_policy.instance_session.*.arn[0]
 }
 
 resource "aws_iam_role_policy_attachment" "instance_additional" {
   count = var.iam_instance_profile == null ? length(var.iam_instance_role_policy_arns) : 0
-  role = aws_iam_role.instance.*.name[0]
+
+  role       = aws_iam_role.instance.*.name[0]
   policy_arn = var.iam_instance_role_policy_arns[count.index]
 }
 
@@ -178,46 +180,48 @@ resource "aws_iam_role_policy_attachment" "instance_additional" {
 # ------------------------
 resource "aws_cloudwatch_metric_alarm" "cpu_util" {
   count = length(var.metrix_alarm_actions) > 0 ? 1 : 0
+
+  alarm_name        = "alarm-${aws_ecs_cluster.cluster.name}-cpu-util"
   alarm_description = "The CPU utilization of ECS cluster '${aws_ecs_cluster.cluster.name}'"
 
-  alarm_name = "alarm-${aws_ecs_cluster.cluster.name}-cpu-util"
-  namespace = "AWS/ECS"
+  namespace   = "AWS/ECS"
   metric_name = "CPUUtilization"
 
   comparison_operator = "GreaterThanOrEqualToThreshold"
-  statistic = "Maximum"
-  threshold = var.metrix_alarm_cpu_util_threshold
-  period = var.metrix_alarm_cpu_util_period
-  evaluation_periods = 1
+  statistic           = "Maximum"
+  threshold           = var.metrix_alarm_cpu_util_threshold
+  period              = var.metrix_alarm_cpu_util_period
+  evaluation_periods  = 1
 
   dimensions = {
     ClusterName = aws_ecs_cluster.cluster.name
   }
 
   actions_enabled = true
-  alarm_actions = var.metrix_alarm_actions
+  alarm_actions   = var.metrix_alarm_actions
 }
 
 resource "aws_cloudwatch_metric_alarm" "memory_util" {
   count = length(var.metrix_alarm_actions) > 0 ? 1 : 0
+
+  alarm_name        = "alarm-${aws_ecs_cluster.cluster.name}-memory-util"
   alarm_description = "The memory utilization of ECS cluster '${aws_ecs_cluster.cluster.name}'"
 
-  alarm_name = "alarm-${aws_ecs_cluster.cluster.name}-memory-util"
-  namespace = "AWS/ECS"
+  namespace   = "AWS/ECS"
   metric_name = "MemoryUtilization"
 
   comparison_operator = "GreaterThanOrEqualToThreshold"
-  statistic = "Maximum"
-  threshold = var.metrix_alarm_memory_util_threshold
-  period = var.metrix_alarm_memory_util_period
-  evaluation_periods = 1
+  statistic           = "Maximum"
+  threshold           = var.metrix_alarm_memory_util_threshold
+  period              = var.metrix_alarm_memory_util_period
+  evaluation_periods  = 1
 
   dimensions = {
     ClusterName = aws_ecs_cluster.cluster.name
   }
 
   actions_enabled = true
-  alarm_actions = var.metrix_alarm_actions
+  alarm_actions   = var.metrix_alarm_actions
 }
 
 # ------------------------
@@ -225,7 +229,8 @@ resource "aws_cloudwatch_metric_alarm" "memory_util" {
 # ------------------------
 resource "aws_cloudwatch_event_rule" "task_stopped" {
   count = var.task_stopped_event_target_arn == null ? 0 : 1
-  name = "event-${aws_ecs_cluster.cluster.name}-task-stopped"
+
+  name        = "event-${aws_ecs_cluster.cluster.name}-task-stopped"
   description = "A ECS task stopped in ECS cluster '${aws_ecs_cluster.cluster.name}'"
 
   event_pattern = jsonencode({
@@ -251,8 +256,9 @@ resource "aws_cloudwatch_event_rule" "task_stopped" {
 
 resource "aws_cloudwatch_event_target" "task_stopped" {
   count = var.task_stopped_event_target_arn == null ? 0 : 1
+
   rule = aws_cloudwatch_event_rule.task_stopped.*.name[0]
-  arn = var.task_stopped_event_target_arn
+  arn  = var.task_stopped_event_target_arn
 
   input_transformer {
     input_template = <<EOF
