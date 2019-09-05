@@ -1,7 +1,7 @@
 # terraform-modules
 
 ## Prerequisites
-The modules were implemented with latest Terraform syntax. The minimum Terraform version allowed is 0.12.0.
+The modules were implemented with latest Terraform syntax. The minimum Terraform version allowed is 0.12.6.
 
 ## AWS
 
