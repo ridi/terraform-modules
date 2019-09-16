@@ -2,15 +2,19 @@
 
 ## Usage
 ```hcl
+# Without KMS
 module "app_params" {
   source = "github.com/ridi/terraform-modules//aws/ssm-parameters"
   
   path = "/my-service/app"
   
-  secret_key  = "mysecret"
-  jwt_rsa_pub = file("${path.module}/include/jwt.pub")
+  params = {
+    secret_key  = "mysecret"
+    jwt_rsa_pub = file("${path.module}/include/jwt.pub")
+  }
 }
 
+# With KMS
 data "aws_kms_key" "foo" {
   key_id = "alias/my-key"
 }
@@ -24,7 +28,7 @@ module "rds_params" {
   path = "/my-service/db"
 
   params = {
-    "host" = "rds-xxx.yyyy.ap-northeast-2.rds.amazonaws.com"
+    host = "rds-xxx.yyyy.ap-northeast-2.rds.amazonaws.com"
 
     "user/root/username" = "root"
     "user/root/password" = "mysecret"
