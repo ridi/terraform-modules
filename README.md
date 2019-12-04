@@ -5,6 +5,9 @@ The modules were implemented with latest Terraform syntax. The minimum Terraform
 
 ## AWS
 
+### ALB
+- [alb](aws/alb)
+
 ### ECS
 - [ecr](aws/ecr)
 - [ecs-autoscailing-cluster](aws/ecs-autoscailing-cluster)
