@@ -71,7 +71,7 @@ module "alb" {
         host        = "my-service.com"
         path        = "/error/400"
         query       = ""
-        status_code = 301
+        status_code = 302
       }
     },
   }
@@ -159,7 +159,7 @@ listeners = {
     default_action = {
       type = "redirect"
       protocol = string (default = "#{protocol}")
-      port = number (default = #{port})
+      port = number (default = "#{port}")
       host = string (default = "#{host}")
       path = string (default = "/#{path}")
       query = string (default = "#{query}")
