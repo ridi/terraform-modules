@@ -37,7 +37,7 @@ locals {
 
   # { target_group_name => health_check_options }
   health_checking_target_groups = { for name, target_group in var.target_groups :
-    name => target_group.health_check if lookup(target_group, "health_check", false) != false
+    name => target_group.health_check if lookup(lookup(target_group, "health_check", {}), "enabled", true)
   }
 }
 
