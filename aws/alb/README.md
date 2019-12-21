@@ -46,32 +46,48 @@ module "alb" {
           priority  = 1
           condition = { path-pattern = ["/robots.txt"] }
           action = {
-            type         = "fixed-response"
-            content_type = "text/plain"
-            message_body = "User-agent: *\nDisallow: /\n"
-            status_code  = "200"
+            type           = "fixed-response"
+            fixed_response = {
+                content_type = "text/plain"
+                message_body = "User-agent: *\nDisallow: /\n"
+                status_code  = "200"
+            }
           }
         },
         service1-api = {
           priority  = 2
-          condition = { host-header = ["api.my-service.com"], path-pattern = ["/foo/*"] }
-          action    = { type = "forward", target_group_name = "lambda-api" }
+          condition = {
+            host-header  = { values = ["api.my-service.com"] }
+            path-pattern = { values = ["/foo/*"] }
+          }
+          action = {
+            type = "forward"
+            target_group_name = "lambda-api"
+          }
         },
         service2-api = {
           priority  = 3
-          condition = { host-header = ["api.my-service.com"], path-pattern = ["/bar/*"] }
-          action    = { type = "forward", target_group_name = "instance-api" }
+          condition = {
+            host-header  = { values = ["api.my-service.com"] }
+            path-pattern = { values = ["/bar/*"] }
+          action = {
+            type = "forward"
+            target_group_name = "instance-api"
+          }
         },
       }
 
       default_action = {
-        type        = "redirect"
-        protocol    = "HTTPS"
-        port        = 443
-        host        = "my-service.com"
-        path        = "/error/400"
-        query       = ""
-        status_code = 302
+        type = "redirect"
+        redirect = {
+          protocol    = "HTTPS"
+          port        = 443
+          host        = "my-service.com"
+          path        = "/error/400"
+          query       = ""
+          status_code = 302
+        }
+        }
       }
     },
   }
@@ -96,9 +112,9 @@ module "alb" {
 {
   # Instance type
   instance_group_A = {
-    type = "instance"
+    type     = "instance"
     protocol = string
-    port = string
+    port     = string
     health_check = { (optional)
       enabled             = bool (default = true)
       healthy_threshold   = number (default = 2)
@@ -112,9 +128,9 @@ module "alb" {
 
   # Lambda type
   lambda_group_B = {
-    type = "lambda"
+    type             = "lambda"
     lambda_func_name = string
-    lambda_arn = string
+    lambda_arn       = string
     health_check = { (optional)
       enabled             = bool (default = true)
       healthy_threshold   = number (default = 2)
@@ -138,8 +154,8 @@ listeners = {
       RULE_NAME = {
         priority = number
         condition = {
-          host-header = list
-          path-pattern = list
+          host-header = { values = list }
+          path-pattern = { values = list }
         }
         # Forward type
         action = {
@@ -149,28 +165,34 @@ listeners = {
         # Fixed response type
         action = {
           type = "fixed_response"
-          content_type = string
-          message_bocy = string
-          status_code = string
+          fixed_response = {
+            content_type = string
+            message_bocy = string
+            status_code = string
+          }
         }
       }
     }
     # Redirect type
     default_action = {
       type = "redirect"
-      protocol = string (default = "#{protocol}")
-      port = number (default = "#{port}")
-      host = string (default = "#{host}")
-      path = string (default = "/#{path}")
-      query = string (default = "#{query}")
-      status_code = number (default = "301")
+      redirect = {
+        protocol    = string (default = "#{protocol}")
+        port        = number (default = "#{port}")
+        host        = string (default = "#{host}")
+        path        = string (default = "/#{path}")
+        query       = string (default = "#{query}")
+        status_code = number (default = "301")
+      }
     }
     # Fixed response type
     default_action = {
       type = "fixed-response"
-      content_type = string (default = "text/plain")
-      message_body = number (default = "")
-      status_code = number (default = "200")
+      fixed_response = {
+        content_type = string (default = "text/plain")
+        message_body = number (default = "")
+        status_code  = number (default = "200")
+      }
     }
   }
 }

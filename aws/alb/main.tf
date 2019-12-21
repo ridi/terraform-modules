@@ -1,6 +1,6 @@
 locals {
-  # { cert_arn => [port1, port2] }
-  listener_certs = { for cert in flatten([for port, listener in var.listeners :
+  # { ${PORT}-${INDEX} => cert_options }
+  listener_certs = { for listener_cert in flatten([for port, listener in var.listeners :
     [for index, cert_arn in lookup(listener, "cert_arns", []) :
       {
         name = "${port}-${index}"
@@ -9,84 +9,36 @@ locals {
       }
     ]
     ]) :
-    cert.name => cert
+    listener_cert.name => listener_cert
   }
 
-  # { rule_name => forward_rule }
-  foward_rules = { for foward_rule in flatten([for port, listener in var.listeners :
+  # { listener_rule_name => listener_rule_oprions }
+  listener_rules = { for listener_rule in flatten([for port, listener in var.listeners :
     [for name, rule in lookup(listener, "rules", {}) :
       {
         name      = name
         port      = port
         priority  = lookup(rule, "priority", null)
         condition = rule.condition
-        action = {
-          target_group_name = rule.action.target_group_name
-        }
-      } if rule.action.type == "forward"
+        action    = rule.action
+      }
     ]
     ]) :
-    foward_rule.name => foward_rule
+    listener_rule.name => listener_rule
   }
 
-  # { rule_name => fixed_response_rule }
-  fixed_response_rules = { for fixed_response_rule in flatten([for port, listener in var.listeners :
-    [for name, rule in lookup(listener, "rules", {}) :
-      {
-        name      = name
-        port      = port
-        priority  = lookup(rule, "priority", null)
-        condition = rule.condition
-        action = {
-          content_type = lookup(rule.action, "content_type", "text/plain")
-          message_body = lookup(rule.action, "message_body", "")
-          status_code  = lookup(rule.action, "status_code", "200")
-        }
-      } if rule.action.type == "fixed-response"
-    ]
-    ]) :
-    fixed_response_rule.name => fixed_response_rule
-  }
-
-  # { target_group_name => instance_target_group }
-  instance_target_groups = { for name, target_group in var.target_groups :
-    name => {
-      protocol = lookup(target_group, "protocol", "HTTP")
-      port     = lookup(target_group, "port", 80)
-      health_check = merge({
-        enabled             = true
-        healthy_threshold   = 2
-        interval            = 10
-        matcher             = "200-399"
-        path                = "/health"
-        timeout             = 5
-        unhealthy_threshold = 5
-      }, lookup(target_group, "health_check", {}))
-    } if target_group.type == "instance"
-  }
-
-  # { target_group_name => lambda_target_group }
+  # { target_group_name => lambda_options }
   lambda_target_groups = { for name, target_group in var.target_groups :
     name => {
-      protocol         = lookup(target_group, "protocol", "HTTP")
       lambda_func_name = target_group.lambda_func_name
       lambda_arn       = target_group.lambda_arn
-      health_check = merge({
-        enabled             = true
-        healthy_threshold   = 2
-        interval            = 10
-        matcher             = "200-399"
-        path                = "/health"
-        timeout             = 5
-        unhealthy_threshold = 5
-      }, lookup(target_group, "health_check", {}))
     } if target_group.type == "lambda"
   }
 
-  # { target_group_name => health_checking_target_group }
-  health_checking_target_groups = length(var.metrix_alarm_actions) > 0 ? { for name, target_group in var.target_groups :
-    name => target_group if lookup(target_group, "health_check", false) == true
-  } : {}
+  # { target_group_name => health_check_options }
+  health_checking_target_groups = { for name, target_group in var.target_groups :
+    name => target_group.health_check if lookup(target_group, "health_check", false) != false
+  }
 }
 
 # ------------------------
@@ -128,8 +80,7 @@ resource "aws_alb_listener" "this" {
     type = each.value.default_action.type
 
     dynamic "redirect" {
-      for_each = (each.value.default_action.type == "redirect" ?
-      [each.value.default_action] : [])
+      for_each = (each.value.default_action.type == "redirect" ? [each.value.default_action.redirect] : [])
 
       content {
         protocol    = lookup(redirect.value, "protocol", "#{protocol}")
@@ -137,14 +88,12 @@ resource "aws_alb_listener" "this" {
         host        = lookup(redirect.value, "host", "#{host}")
         path        = lookup(redirect.value, "path", "/#{path}")
         query       = lookup(redirect.value, "query", "#{query}")
-        status_code = "HTTP_${lookup(redirect.value, "status_code", "301")}"
+        status_code = "HTTP_${lookup(redirect.value, "status_code", "302")}"
       }
     }
 
     dynamic "fixed_response" {
-      for_each = (each.value.default_action.type == "fixed-response" ?
-      [each.value.default_action] : [])
-
+      for_each = (each.value.default_action.type == "fixed-response" ? [each.value.default_action.fixed_response] : [])
       content {
         content_type = lookup(fixed_response.value, "content_type", "text/plain")
         message_body = lookup(fixed_response.value, "messasge_body", "")
@@ -167,55 +116,28 @@ resource "aws_alb_listener_certificate" "this" {
 # ------------------------
 # ALB target groups
 # ------------------------
-resource "aws_alb_target_group" "instance" {
-  for_each = local.instance_target_groups
+resource "aws_alb_target_group" "this" {
+  for_each = var.target_groups
 
   name                 = each.key
-  target_type          = "instance"
-  vpc_id               = var.vpc_id
-  protocol             = each.value.protocol
-  port                 = each.value.port
+  target_type          = lookup(each.value, "type", "instance")
   deregistration_delay = 30
 
-  dynamic "health_check" {
-    for_each = [each.value.health_check]
-
-    content {
-      enabled             = health_check.value.enabled
-      healthy_threshold   = health_check.value.healthy_threshold
-      interval            = health_check.value.interval
-      matcher             = health_check.value.matcher
-      path                = health_check.value.path
-      timeout             = health_check.value.timeout
-      unhealthy_threshold = health_check.value.unhealthy_threshold
-    }
-  }
-
-  tags = var.tags
-
-  lifecycle {
-    create_before_destroy = true
-  }
-}
-
-resource "aws_alb_target_group" "lambda" {
-  for_each = local.lambda_target_groups
-
-  name                 = each.key
-  target_type          = "lambda"
-  deregistration_delay = 30
+  # instance type only options
+  vpc_id   = lookup(each.value, "type", "instance") == "instance" ? var.vpc_id : null
+  protocol = lookup(each.value, "type", "instance") == "instance" ? lookup(each.value, "protocol", "HTTP") : null
+  port     = lookup(each.value, "type", "instance") == "instance" ? lookup(each.value, "port", 80) : null
 
   dynamic "health_check" {
-    for_each = [each.value.health_check]
-
+    for_each = lookup(each.value, "health_check", false) == false ? [] : [each.value.health_check]
     content {
-      enabled             = health_check.value.enabled
-      healthy_threshold   = health_check.value.healthy_threshold
-      interval            = health_check.value.interval
-      matcher             = health_check.value.matcher
-      path                = health_check.value.path
-      timeout             = health_check.value.timeout
-      unhealthy_threshold = health_check.value.unhealthy_threshold
+      enabled             = lookup(health_check.value, "enabled", true)
+      healthy_threshold   = lookup(health_check.value, "healthy_threshold", 2)
+      interval            = lookup(health_check.value, "interval", 10)
+      matcher             = lookup(health_check.value, "matcher", "200-399")
+      path                = lookup(health_check.value, "path", "/health")
+      timeout             = lookup(health_check.value, "timeout", 5)
+      unhealthy_threshold = lookup(health_check.value, "unhealthy_threshold", 5)
     }
   }
 
@@ -231,14 +153,14 @@ resource "aws_lambda_permission" "lambda" {
 
   principal     = "elasticloadbalancing.amazonaws.com"
   action        = "lambda:InvokeFunction"
-  source_arn    = aws_alb_target_group.lambda[each.key].arn
+  source_arn    = aws_alb_target_group.this[each.key].arn
   function_name = each.value.lambda_func_name
 }
 
 resource "aws_alb_target_group_attachment" "lambda" {
   for_each = local.lambda_target_groups
 
-  target_group_arn = aws_alb_target_group.lambda[each.key].arn
+  target_group_arn = aws_alb_target_group.this[each.key].arn
   target_id        = each.value.lambda_arn
 
   depends_on = [aws_lambda_permission.lambda]
@@ -247,49 +169,84 @@ resource "aws_alb_target_group_attachment" "lambda" {
 # ------------------------
 # ALB listener rules
 # ------------------------
-resource "aws_alb_listener_rule" "forward" {
-  for_each = local.foward_rules
+resource "aws_alb_listener_rule" "this" {
+  for_each = local.listener_rules
 
   priority     = each.value.priority
   listener_arn = aws_alb_listener.this[each.value.port].arn
 
   dynamic "condition" {
     for_each = each.value.condition
-
     content {
-      field  = condition.key
-      values = condition.value
+      dynamic "host_header" {
+        for_each = condition.key == "host_header" ? [condition.value] : []
+        content {
+          values = host_header.value.values
+        }
+      }
+
+      dynamic "http_header" {
+        for_each = condition.key == "http_header" ? [condition.value] : []
+        content {
+          http_header_name = http_header.value.http_header_name
+          values           = http_header.value.values
+        }
+      }
+
+      dynamic "http_request_method" {
+        for_each = condition.key == "http_request_method" ? [condition.value] : []
+        content {
+          values = http_request_method.value.values
+        }
+      }
+
+      dynamic "path_pattern" {
+        for_each = condition.key == "path_pattern" ? [condition.value] : []
+        content {
+          values = path_pattern.value.values
+        }
+      }
+
+      dynamic "query_string" {
+        for_each = condition.key == "query_string" ? condition.value.values : []
+        content {
+          key   = lookup(query_string.value, "key", null)
+          value = query_string.value.value
+        }
+      }
+
+      dynamic "source_ip" {
+        for_each = condition.key == "source_ip" ? [condition.value] : []
+        content {
+          values = source_ip.value.values
+        }
+      }
     }
   }
 
   action {
-    type             = "forward"
-    target_group_arn = merge(aws_alb_target_group.instance, aws_alb_target_group.lambda)[each.value.action.target_group_name].arn
-  }
-}
+    type             = each.value.action.type
+    target_group_arn = each.value.action.type == "forward" ? aws_alb_target_group.this[each.value.action.target_group_name].arn : null
 
-resource "aws_alb_listener_rule" "fixed_response" {
-  for_each = local.fixed_response_rules
-
-  priority     = each.value.priority
-  listener_arn = aws_alb_listener.this[each.value.port].arn
-
-  dynamic "condition" {
-    for_each = each.value.condition
-
-    content {
-      field  = condition.key
-      values = condition.value
+    dynamic "redirect" {
+      for_each = each.value.action.type == "redirect" ? [each.value.action.redirect] : []
+      content {
+        protocol    = lookup(redirect.value, "protocol", "#{protocol}")
+        port        = lookup(redirect.value, "port", "#{port}")
+        host        = lookup(redirect.value, "host", "#{host}")
+        path        = lookup(redirect.value, "path", "/#{path}")
+        query       = lookup(redirect.value, "query", "#{query}")
+        status_code = "HTTP_${lookup(redirect.value, "status_code", "302")}"
+      }
     }
-  }
 
-  action {
-    type = "fixed-response"
-
-    fixed_response {
-      content_type = each.value.action.content_type
-      message_body = each.value.action.message_body
-      status_code  = each.value.action.status_code
+    dynamic "fixed_response" {
+      for_each = each.value.action.type == "fixed-response" ? [each.value.action.fixed_response] : []
+      content {
+        content_type = lookup(fixed_response.value, "content_type", "text/html")
+        message_body = lookup(fixed_response.value, "message_body", "")
+        status_code  = lookup(fixed_response.value, "status_code", "200")
+      }
     }
   }
 }
@@ -298,7 +255,7 @@ resource "aws_alb_listener_rule" "fixed_response" {
 # CloudWatch metric alarms
 # ------------------------
 resource "aws_cloudwatch_metric_alarm" "unhealty_host" {
-  for_each = local.health_checking_target_groups
+  for_each = length(var.metrix_alarm_actions) > 0 ? local.health_checking_target_groups : {}
 
   alarm_description = "The unhealthy host count of target group '${each.key}'"
 
@@ -314,7 +271,7 @@ resource "aws_cloudwatch_metric_alarm" "unhealty_host" {
 
   dimensions = {
     LoadBalancer = aws_alb.this.arn_suffix
-    TargetGroup  = merge(aws_alb_target_group.instance, aws_alb_target_group.lambda)[each.key].arn_suffix
+    TargetGroup  = aws_alb_target_group.this[each.key].arn_suffix
   }
 
   actions_enabled = true
