@@ -106,3 +106,12 @@ variable "deployment_max_percent" {
   type        = number
   default     = 200
 }
+
+variable "volumes" {
+  description = "Docker volume block list"
+  type        = list(object({
+    name      = string
+    host_path = string
+  }))
+  default     = []
+}
