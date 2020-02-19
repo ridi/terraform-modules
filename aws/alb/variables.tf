@@ -42,12 +42,13 @@ variable "log_bucket_prefix" {
 }
 
 variable "target_groups" {
-  type = any
+  description = "The config values for multiple target groups"
+  type        = any
   # map({
   #   instance_group_A = {
-  #     type = "instance"
-  #     protocol = string
-  #     port = string
+  #     type         = "instance"
+  #     protocol     = string
+  #     port         = string
   #     health_check = object({ (optional)
   #       enabled             = bool (default = true)
   #       healthy_threshold   = number (default = 2)
@@ -60,9 +61,9 @@ variable "target_groups" {
   #   }
   #   or
   #   lambda_group_B = {
-  #     type = "lambda"
-  #     lambda_func_name = string
-  #     lambda_arn = string
+  #     type              = "lambda"
+  #     lambda_func_name  = string
+  #     lambda_arn        = string
   #     health_check = object({ (optional)
   #       enabled             = bool (default = true)
   #       healthy_threshold   = number (default = 2)
@@ -78,46 +79,47 @@ variable "target_groups" {
 }
 
 variable "listeners" {
-  type = any
+  description = "The config values for multiple listeners and listener rules"
+  type        = any
   # map({
   #   $PORT_NUM = {
-  #     protocol = string (default = "HTTP")
+  #     protocol  = string (default = "HTTP")
   #     cert_arns = list(string) (optional)
   #     rules = {
   #       $RULE_NAME = {
   #         priority = number
   #         condition = {
-  #           host-header = list
+  #           host-header  = list
   #           path-pattern = list
   #         }
   #         action = {
-  #           type = "forward"
+  #           type              = "forward"
   #           target_group_name = string
   #         }
   #         OR
   #         action = {
-  #           type = "fixed_response"
-  #           content_type = string
-  #           message_bocy = string
-  #           status_code = string
+  #           type          = "fixed_response"
+  #           content_type  = string
+  #           message_bocy  = string
+  #           status_code   = string
   #         }
   #       }
   #     }
   #     default_action = {
-  #       type = "redirect"
-  #       protocol = string (default = "#{protocol}")
-  #       port = number (default = #{port})
-  #       host = string (default = "#{host}")
-  #       path = string (default = "/#{path}")
-  #       query = string (default = "#{query}")
+  #       type        = "redirect"
+  #       protocol    = string (default = "#{protocol}")
+  #       port        = number (default = #{port})
+  #       host        = string (default = "#{host}")
+  #       path        = string (default = "/#{path}")
+  #       query       = string (default = "#{query}")
   #       status_code = number (default = "301")
   #     }
   #     OR
   #     default_action = {
-  #       type = "fixed-response"
+  #       type         = "fixed-response"
   #       content_type = string (default = "text/plain")
   #       message_body = number (default = "")
-  #       status_code = number (default = "200")
+  #       status_code  = number (default = "200")
   #     }
   #   }
   # })

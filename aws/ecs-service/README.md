@@ -17,6 +17,10 @@ module "service" {
   awsvpc_subnet_ids      = data.aws_subnet_ids.private.ids
   awsvpc_security_groups = ["sg-1234abcd"]
   
+  volumes = [
+    { name = "my-volume", host_path = "/ecs/my-service/app" }
+  ]
+
   container_definitions = [
     {
       name  = "app",
@@ -33,6 +37,9 @@ module "service" {
         { name = "DB_DBNAME", valueFrom = "/rds/db/my-service" },
         { name = "DB_USER", valueFrom = "/rds/user/someone/username" },
         { name = "DB_PASSWORD", valueFrom = "/rds/user/someone/password" },
+      ],
+      mountPoints = [
+        { sourceVolume = "my-volume", containerPath = "/app/data", readOnly = true },
       ],
       essential         = true
       cpu               = 100,
@@ -80,5 +87,6 @@ These variables are ignored if `task_definition_arn` is set
 - `task_memory` - The amount (in MB) of memory used by the task. (used in Fargate)
 - `task_network_mode` - The Docker networking mode to use for the containers in the task. ('none', 'bridge', 'awsvpc', 'host')
 - `iam_task_role_arn` - The ARN of IAM role of ECS task
-- `iam_exec_role_arn` - ARN of IAM role to execute ECS task
+- `iam_exec_role_arn` - The ARN of IAM role to execute ECS task
+- `volumes` - The list of Docker volume definition
 - `container_definitions` - The definitions of each container. (See https://docs.aws.amazon.com/ko_kr/AmazonECS/latest/developerguide/create-task-definition.html)

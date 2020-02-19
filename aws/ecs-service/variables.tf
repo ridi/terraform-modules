@@ -1,10 +1,10 @@
 variable "cluster_name" {
-  description = "Name of ECS cluster to deploy ECS service on"
+  description = "The name of ECS cluster to deploy ECS service on"
   type        = string
 }
 
 variable "service_name" {
-  description = "Name of this ECS service"
+  description = "The name of this ECS service"
   type        = string
 }
 
@@ -57,31 +57,52 @@ variable "awsvpc_assign_public_ip" {
 }
 
 variable "alb_target_group_name" {
-  description = "Name of ALB target group. if doesn't use ALB, set this null"
+  description = "The name of ALB target group. if doesn't use ALB, set this null"
   type        = string
   default     = null
 }
 
 variable "alb_container_name" {
-  description = "Name of container bound to ALB target group"
+  description = "The name of container bound to ALB target group"
   type        = string
   default     = "app"
 }
 
 variable "alb_container_port" {
-  description = "Port of container bound to ALB target group"
+  description = "The port of container bound to ALB target group"
   type        = number
   default     = 80
 }
 
 variable "iam_exec_role_arn" {
-  description = "ARN of IAM role to execute ECS task"
+  description = "The ARN of IAM role to execute ECS task"
   default     = null
 }
 
 variable "iam_task_role_arn" {
-  description = "ARN of IAM role of ECS task"
+  description = "The ARN of IAM role of ECS task"
   default     = null
+}
+
+variable "volumes" {
+  description = "The list of Docker volume definition."
+  type        = list(any)
+
+  # array([
+  #   {
+  #     name      = string
+  #     host_path = string (optional)
+  #     docker_volume_configuration = map({ (optional)
+  #       scope         = string (optional)
+  #       autoprovision = bool (optional)
+  #       driver        = string (optional)
+  #       driver_opts   = map (optional)
+  #       labels        = map (optional)
+  #     })
+  #   },
+  # ])
+
+  default = []
 }
 
 variable "container_definitions" {
@@ -105,13 +126,4 @@ variable "deployment_max_percent" {
   description = "Upper limit of tasks as a percentage"
   type        = number
   default     = 200
-}
-
-variable "volumes" {
-  description = "Docker volume block list"
-  type        = list(object({
-    name      = string
-    host_path = string
-  }))
-  default     = []
 }

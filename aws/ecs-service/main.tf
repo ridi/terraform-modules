@@ -71,11 +71,23 @@ resource "aws_ecs_task_definition" "this" {
   container_definitions = jsonencode(var.container_definitions)
 
   dynamic "volume" {
-    for_each = var.volumes[*]
+    for_each = var.volumes
 
     content {
       name      = volume.value.name
       host_path = volume.value.host_path
+
+      dynamic "docker_volume_configuration" {
+        for_each = lookup(volume.value, "docker_volume_configuration", null) == null ? [] : [volume.value.docker_volume_configuration]
+
+        content {
+          scope         = lookup(docker_volume_configuration.value, "scope", null)
+          autoprovision = lookup(docker_volume_configuration.value, "autoprovision", null)
+          driver        = lookup(docker_volume_configuration.value, "driver", null)
+          driver_opts   = lookup(docker_volume_configuration.value, "driver_opts", null)
+          labels        = lookup(docker_volume_configuration.value, "labels", null)
+        }
+      }
     }
   }
 }
