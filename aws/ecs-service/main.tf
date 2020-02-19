@@ -69,4 +69,13 @@ resource "aws_ecs_task_definition" "this" {
   network_mode             = local.task_network_mode
 
   container_definitions = jsonencode(var.container_definitions)
+
+  dynamic "volume" {
+    for_each = var.volumes[*]
+
+    content {
+      name      = volume.value.name
+      host_path = volume.value.host_path
+    }
+  }
 }
