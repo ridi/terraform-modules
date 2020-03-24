@@ -1,6 +1,7 @@
 # alb
 
 ## Usage
+
 ```hcl
 module "alb" {
   source = "github.com/ridi/terraform-modules//aws/alb"
@@ -8,7 +9,7 @@ module "alb" {
   name       = "my-alb"
   vpc_id     = data.aws_vpc.my_vpc.id
   subnet_ids = data.aws_subnet_ids.my_subnet.ids
-  
+
   security_group_ids = [
     module.sg_alb.this_security_group_id,
   ]
@@ -19,11 +20,13 @@ module "alb" {
       lambda_func_name = data.aws_lambda_function.my_lambda.function_name
       lambda_arn       = data.aws_lambda_function.my_lambda.arn
       health_check     = { enabled = false }
+      http5xx_alarm    = { enabled = false }
     },
     instance-api = {
-      type         = "instance"
-      port         = 80
-      health_check = { path = "/health" }
+      type          = "instance"
+      port          = 80
+      health_check  = { path = "/health" }
+      http5xx_alarm = { threshold = 5, period = 600 }
     },
   }
 
@@ -97,17 +100,21 @@ module "alb" {
 ## Input Variables
 
 ### Common
+
 - `tags`: The tags to assign to all resources
 
 ### VPC
+
 - `vpc_id`: The ID of VPC where default target groups are created
 - `subnet_ids`: The ID of subnets where ALB is created
 - `security_group_ids`: The ID of security groups of ALB
 
 ### ALB
+
 - `name`: The name of ALB
 
 - `target_groups`: The config values for multiple target groups in form of the below
+
 ```hcl
 {
   # Instance type
@@ -123,6 +130,11 @@ module "alb" {
       path                = string (default = "/health")
       timeout             = number (default = 5)
       unhealthy_threshold = number (default = 5)
+    }
+    http5xx_alarm = { (optional)
+      threshold           = number (default = 0)
+      period              = number (default = 300)
+      comparison_operator = string (default = "GreaterThanThreshold" )
     }
   }
 
@@ -145,6 +157,7 @@ module "alb" {
 ```
 
 - `listeners`: The config values for multiple listeners and listener rules in form of the below
+
 ```hcl
 listeners = {
   80 (port number) = {
@@ -199,9 +212,11 @@ listeners = {
 ```
 
 ### S3
+
 - `log_enable`: Write ALB log to S3 bucket
 - `log_bucket`: The name of S3 bucket for logging
 - `log_bucket_prefix`: The prefix of log data on S3 bucket
 
 ### CloudWatch
+
 - `metrix_alarm_actions`: The actions of CloudWatch metrix alarm

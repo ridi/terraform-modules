@@ -37,7 +37,17 @@ locals {
 
   # { target_group_name => health_check_options }
   health_checking_target_groups = { for name, target_group in var.target_groups :
-    name => target_group.health_check if lookup(lookup(target_group, "health_check", {}), "enabled", true)
+    name => target_group.health_check
+    if lookup(lookup(target_group, "health_check", {}), "enabled", true)
+  }
+
+  # { target_group_name => target_http5xx_alarm_options }
+  http5xx_alarm_target_groups = { for name, target_group in var.target_groups :
+    name => {
+      comparison_operator = lookup(target_group.http5xx_alarm, "comparison_operator", "GreaterThanThreshold")
+      threshold           = lookup(target_group.http5xx_alarm, "threshold", 0)
+      period              = lookup(target_group.http5xx_alarm, "period", 300)
+    } if lookup(lookup(target_group, "http5xx_alarm", {}), "enabled", true)
   }
 }
 
@@ -268,6 +278,31 @@ resource "aws_cloudwatch_metric_alarm" "unhealty_host" {
   threshold           = 0
   period              = 60
   evaluation_periods  = 1
+
+  dimensions = {
+    LoadBalancer = aws_alb.this.arn_suffix
+    TargetGroup  = aws_alb_target_group.this[each.key].arn_suffix
+  }
+
+  actions_enabled = true
+  alarm_actions   = var.metrix_alarm_actions
+}
+
+resource "aws_cloudwatch_metric_alarm" "http5xx_alarm" {
+  for_each = length(var.metrix_alarm_actions) > 0 ? local.http5xx_alarm_target_groups : {}
+
+  alarm_description = "The http 5xx code count of target group '${each.key}'"
+
+  alarm_name  = "alarm-${each.key}-target-5xx-count"
+  namespace   = "AWS/ApplicationELB"
+  metric_name = "HTTPCode_Target_5XX_Count"
+
+  statistic           = "Sum"
+  comparison_operator = each.value.comparison_operator
+  threshold           = each.value.threshold
+  period              = each.value.period
+
+  evaluation_periods = 1
 
   dimensions = {
     LoadBalancer = aws_alb.this.arn_suffix
