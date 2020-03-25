@@ -288,7 +288,7 @@ resource "aws_cloudwatch_metric_alarm" "unhealty_host" {
   alarm_actions   = var.metrix_alarm_actions
 }
 
-resource "aws_cloudwatch_metric_alarm" "http5xx_alarm" {
+resource "aws_cloudwatch_metric_alarm" "http5xx" {
   for_each = length(var.metrix_alarm_actions) > 0 ? local.http5xx_alarm_target_groups : {}
 
   alarm_description = "The http 5xx code count of target group '${each.key}'"
