@@ -291,7 +291,7 @@ resource "aws_cloudwatch_metric_alarm" "unhealty_host" {
 resource "aws_cloudwatch_metric_alarm" "http5xx" {
   for_each = length(var.metrix_alarm_actions) > 0 ? local.http5xx_alarm_target_groups : {}
 
-  alarm_description = "The http 5xx code count of target group '${each.key}'"
+  alarm_description = "The count of http 5xx response from target group '${each.key}'"
 
   alarm_name  = "alarm-${each.key}-target-5xx-count"
   namespace   = "AWS/ApplicationELB"
