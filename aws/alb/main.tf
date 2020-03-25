@@ -44,9 +44,9 @@ locals {
   # { target_group_name => http5xx_alarm_options }
   http5xx_alarm_target_groups = { for name, target_group in var.target_groups :
     name => {
-      comparison_operator = lookup(target_group.http5xx_alarm, "comparison_operator", "GreaterThanThreshold")
-      threshold           = lookup(target_group.http5xx_alarm, "threshold", 0)
-      period              = lookup(target_group.http5xx_alarm, "period", 300)
+      threshold          = lookup(target_group.http5xx_alarm, "threshold", 0)
+      period             = lookup(target_group.http5xx_alarm, "period", 300)
+      evaluation_periods = lookup(target_group.http5xx_alarm, "evaluation_periods", 1)
     } if lookup(lookup(target_group, "http5xx_alarm", {}), "enabled", true)
   }
 }
@@ -298,11 +298,11 @@ resource "aws_cloudwatch_metric_alarm" "http5xx" {
   metric_name = "HTTPCode_Target_5XX_Count"
 
   statistic           = "Sum"
-  comparison_operator = each.value.comparison_operator
-  threshold           = each.value.threshold
-  period              = each.value.period
+  comparison_operator = "GreaterThanThreshold"
 
-  evaluation_periods = 1
+  threshold          = each.value.threshold
+  period             = each.value.period
+  evaluation_periods = each.value.evaluation_periods
 
   dimensions = {
     LoadBalancer = aws_alb.this.arn_suffix

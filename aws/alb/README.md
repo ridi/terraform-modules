@@ -132,9 +132,10 @@ module "alb" {
       unhealthy_threshold = number (default = 5)
     }
     http5xx_alarm = { (optional)
-      threshold           = number (default = 0)
-      period              = number (default = 300)
-      comparison_operator = string (default = "GreaterThanThreshold" )
+      enabled            = bool (default = true)
+      threshold          = number (default = 0)
+      period             = number (default = 300)
+      evaluation_periods = number (default = 1)
     }
   }
 
