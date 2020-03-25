@@ -41,7 +41,7 @@ locals {
     if lookup(lookup(target_group, "health_check", {}), "enabled", true)
   }
 
-  # { target_group_name => target_http5xx_alarm_options }
+  # { target_group_name => http5xx_alarm_options }
   http5xx_alarm_target_groups = { for name, target_group in var.target_groups :
     name => {
       comparison_operator = lookup(target_group.http5xx_alarm, "comparison_operator", "GreaterThanThreshold")
