@@ -20,13 +20,13 @@ module "alb" {
       lambda_func_name = data.aws_lambda_function.my_lambda.function_name
       lambda_arn       = data.aws_lambda_function.my_lambda.arn
       health_check     = { enabled = false }
-      http5xx_alarm    = { enabled = false }
+      http5xx_alarm    = { threshold = 5, period = 600, evaluation_periods = 1 }
     },
     instance-api = {
       type          = "instance"
       port          = 80
       health_check  = { path = "/health" }
-      http5xx_alarm = { threshold = 5, period = 600 }
+      http5xx_alarm    = { threshold = 5, period = 600, evaluation_periods = 1 }
     },
   }
 
