@@ -73,6 +73,12 @@ variable "target_groups" {
   #       timeout             = number (default = 5)
   #       unhealthy_threshold = number (default = 5)
   #     })
+  #     http5xx_alarm = object({ (optional)
+  #       enabled            = bool (default = true)
+  #       threshold          = number (default = 0)
+  #       period             = number (default = 300)
+  #       evaluation_periods = number (default = 1)
+  #     })
   # })
 
   default = {}
