@@ -298,6 +298,7 @@ resource "aws_cloudwatch_metric_alarm" "http5xx" {
   metric_name = "HTTPCode_Target_5XX_Count"
 
   statistic           = "Sum"
+  treat_missing_data  = "notBreaching"
   comparison_operator = "GreaterThanThreshold"
 
   threshold          = each.value.threshold
