@@ -48,7 +48,7 @@ locals {
       threshold          = lookup(target_group.http5xx_alarm, "threshold", 0)
       period             = lookup(target_group.http5xx_alarm, "period", 300)
       evaluation_periods = lookup(target_group.http5xx_alarm, "evaluation_periods", 1)
-      treat_missing_data = lookup(target_group.http5xx_alarm, "treat_missing_data", "notBreaching")
+      treat_missing_data = lookup(target_group.http5xx_alarm, "treat_missing_data", "missing")
     } if lookup(lookup(target_group, "http5xx_alarm", {}), "enabled", true)
   }
 }
