@@ -47,7 +47,6 @@ locals {
       threshold          = lookup(target_group.http5xx_alarm, "threshold", 0)
       period             = lookup(target_group.http5xx_alarm, "period", 300)
       evaluation_periods = lookup(target_group.http5xx_alarm, "evaluation_periods", 1)
-      treat_missing_data = lookup(target_group.http5xx_alarm, "treat_missing_data", "missing")
     } if lookup(lookup(target_group, "http5xx_alarm", {}), "enabled", true)
   }
 }
@@ -299,12 +298,12 @@ resource "aws_cloudwatch_metric_alarm" "http5xx" {
   metric_name = "HTTPCode_Target_5XX_Count"
 
   statistic           = "Sum"
+  treat_missing_data  = "notBreaching"
   comparison_operator = "GreaterThanThreshold"
 
   threshold          = each.value.threshold
   period             = each.value.period
   evaluation_periods = each.value.evaluation_periods
-  treat_missing_data = each.value.treat_missing_data
 
   dimensions = {
     LoadBalancer = aws_alb.this.arn_suffix
