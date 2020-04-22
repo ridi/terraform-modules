@@ -56,10 +56,10 @@ variable "awsvpc_assign_public_ip" {
   default     = null
 }
 
-variable "alb_target_group_name" {
-  description = "The name of ALB target group. if doesn't use ALB, set this null"
-  type        = string
-  default     = null
+variable "alb_target_group_names" {
+  description = "The name of ALB target groups. if doesn't use ALB, set this null"
+  type        = list(any)
+  default     = []
 }
 
 variable "alb_container_name" {

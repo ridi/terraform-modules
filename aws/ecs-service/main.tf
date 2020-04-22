@@ -11,8 +11,8 @@ locals {
 }
 
 data "aws_lb_target_group" "this" {
-  count = var.alb_target_group_name == null ? 0 : 1
-  name  = var.alb_target_group_name
+  count = length(var.alb_target_group_names)
+  name  = var.alb_target_group_names[count.index]
 }
 
 resource "aws_ecs_service" "this" {
@@ -45,7 +45,7 @@ resource "aws_ecs_service" "this" {
   }
 
   dynamic "load_balancer" {
-    for_each = var.alb_target_group_name == null ? [] : [data.aws_lb_target_group.this.*.arn[0]]
+    for_each = data.aws_lb_target_group.this.*.arn
 
     content {
       target_group_arn = load_balancer.value
