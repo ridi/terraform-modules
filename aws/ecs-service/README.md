@@ -9,9 +9,13 @@ module "service" {
   cluster_name = "my-cluster"
   service_name = "my-service"
 
-  alb_target_group_names = ["my-alb", "my-second-alb"]
-  alb_container_name    = "app"
-  alb_container_port    = 80
+  load_balancers = [
+    {
+      target_group_arn = "my-alb"
+      container_name   = "app"
+      container_port   = 80
+    }
+  ]
 
   # If you runs with EC2 type instead Fargate, ignore belows (launch_type, awsvpc_*).
   launch_type            = "FARGATE"
@@ -80,9 +84,7 @@ module "service" {
 - `awsvpc_subnet_ids` - The subnets associated with the task or service (task_network_mode)
 - `awsvpc_security_groups` - The security groups associated with the task or service
 - `awsvpc_assign_public_ip` - Whether assigns a public IP address to the ENI or not
-- `alb_target_group_names` - The name of ALB target group. if doesn't use ALB, skip or set to empty list
-- `alb_container_name` - The name of container bound to ALB target group
-- `alb_container_port` - The port of container bound to ALB target group
+- `load_balancers` - The list of load balancer associations `[{ target_group_arn, container_name, container_port }]`
 
 ### ECS Task Definition
 

@@ -56,22 +56,14 @@ variable "awsvpc_assign_public_ip" {
   default     = null
 }
 
-variable "alb_target_group_names" {
-  description = "The name of ALB target groups. if doesn't use ALB, set this null"
-  type        = list(any)
-  default     = []
-}
-
-variable "alb_container_name" {
-  description = "The name of container bound to ALB target group"
-  type        = string
-  default     = "app"
-}
-
-variable "alb_container_port" {
-  description = "The port of container bound to ALB target group"
-  type        = number
-  default     = 80
+variable "load_balancers" {
+  description = "The list of load balancer associations [{ target_group_arn, container_name, container_port }]"
+  type = list(object({
+    target_group_arn = string,
+    container_name   = string,
+    container_port   = number,
+  }))
+  default = []
 }
 
 variable "iam_exec_role_arn" {

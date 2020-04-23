@@ -10,11 +10,6 @@ locals {
   awsvpc_assign_public_ip = var.awsvpc_assign_public_ip == null ? (local.task_network_mode == "awsvpc" ? false : null) : var.awsvpc_assign_public_ip
 }
 
-data "aws_lb_target_group" "this" {
-  count = length(var.alb_target_group_names)
-  name  = var.alb_target_group_names[count.index]
-}
-
 resource "aws_ecs_service" "this" {
   name            = var.service_name
   launch_type     = var.launch_type
@@ -45,12 +40,12 @@ resource "aws_ecs_service" "this" {
   }
 
   dynamic "load_balancer" {
-    for_each = data.aws_lb_target_group.this.*.arn
+    for_each = var.load_balancers
 
     content {
-      target_group_arn = load_balancer.value
-      container_name   = var.alb_container_name
-      container_port   = var.alb_container_port
+      target_group_arn = load_balancer.value.target_group_arn
+      container_name   = load_balancer.value.container_name
+      container_port   = load_balancer.value.container_port
     }
   }
 }
