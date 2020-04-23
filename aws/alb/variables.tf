@@ -12,17 +12,17 @@ variable "vpc_id" {
 
 variable "subnet_ids" {
   description = "The ID of subnets where ALB is created"
-  type        = "list"
+  type        = list(string)
 }
 
 variable "security_group_ids" {
   description = "The ID of security groups of ALB"
-  type        = "list"
+  type        = list(string)
 }
 
 variable "tags" {
   description = "The tags to assign to all resources"
-  type        = "map"
+  type        = map(string)
   default     = {}
 }
 
