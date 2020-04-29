@@ -86,3 +86,54 @@ resource "aws_ecs_task_definition" "this" {
     }
   }
 }
+
+# ------------------------
+# CloudWatch Metric Alarms
+# ------------------------
+resource "aws_cloudwatch_metric_alarm" "cpu_util" {
+  count = length(var.metrix_alarm_actions) > 0 ? 1 : 0
+
+  alarm_name        = "alarm-ecs-srv-${aws_ecs_service.this.name}-cpu-util"
+  alarm_description = "The CPU utilization of ECS service '${aws_ecs_service.this.name}'"
+
+  namespace   = "AWS/ECS"
+  metric_name = "CPUUtilization"
+
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  statistic           = "Maximum"
+  threshold           = var.metrix_alarm_cpu_util_threshold
+  period              = var.metrix_alarm_cpu_util_period
+  evaluation_periods  = 1
+
+  dimensions = {
+    ClusterName = var.cluster_name
+    ServiceName = aws_ecs_service.this.name
+  }
+
+  actions_enabled = true
+  alarm_actions   = var.metrix_alarm_actions
+}
+
+resource "aws_cloudwatch_metric_alarm" "memory_util" {
+  count = length(var.metrix_alarm_actions) > 0 ? 1 : 0
+
+  alarm_name        = "alarm-ecs-srv-${aws_ecs_service.this.name}-mem-util"
+  alarm_description = "The memory utilization of ECS service '${aws_ecs_service.this.name}'"
+
+  namespace   = "AWS/ECS"
+  metric_name = "MemoryUtilization"
+
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  statistic           = "Maximum"
+  threshold           = var.metrix_alarm_memory_util_threshold
+  period              = var.metrix_alarm_memory_util_period
+  evaluation_periods  = 1
+
+  dimensions = {
+    ClusterName = var.cluster_name
+    ServiceName = aws_ecs_service.this.name
+  }
+
+  actions_enabled = true
+  alarm_actions   = var.metrix_alarm_actions
+}

@@ -119,3 +119,33 @@ variable "deployment_max_percent" {
   type        = number
   default     = 200
 }
+
+variable "metrix_alarm_actions" {
+  description = "The actions of CloudWatch metrix alarm"
+  type        = list(string)
+  default     = []
+}
+
+variable "metrix_alarm_memory_util_threshold" {
+  description = "The threshold of memory utilization CloudWatch metrix alarm"
+  type        = number
+  default     = 80
+}
+
+variable "metrix_alarm_memory_util_period" {
+  description = "The period of memory utilization CloudWatch metrix alarm"
+  type        = number
+  default     = 60
+}
+
+variable "metrix_alarm_cpu_util_threshold" {
+  description = "The threshold of CPU utilization CloudWatch metrix alarm"
+  type        = number
+  default     = 80
+}
+
+variable "metrix_alarm_cpu_util_period" {
+  description = "The period of CPU utilization CloudWatch metrix alarm"
+  type        = number
+  default     = 60
+}

@@ -181,7 +181,7 @@ resource "aws_iam_role_policy_attachment" "instance_additional" {
 resource "aws_cloudwatch_metric_alarm" "cpu_util" {
   count = length(var.metrix_alarm_actions) > 0 ? 1 : 0
 
-  alarm_name        = "alarm-${aws_ecs_cluster.cluster.name}-cpu-util"
+  alarm_name        = "alarm-ecs-cls-${aws_ecs_cluster.cluster.name}-cpu-util"
   alarm_description = "The CPU utilization of ECS cluster '${aws_ecs_cluster.cluster.name}'"
 
   namespace   = "AWS/ECS"
@@ -204,7 +204,7 @@ resource "aws_cloudwatch_metric_alarm" "cpu_util" {
 resource "aws_cloudwatch_metric_alarm" "memory_util" {
   count = length(var.metrix_alarm_actions) > 0 ? 1 : 0
 
-  alarm_name        = "alarm-${aws_ecs_cluster.cluster.name}-memory-util"
+  alarm_name        = "alarm-ecs-cls-${aws_ecs_cluster.cluster.name}-mem-util"
   alarm_description = "The memory utilization of ECS cluster '${aws_ecs_cluster.cluster.name}'"
 
   namespace   = "AWS/ECS"
@@ -230,7 +230,7 @@ resource "aws_cloudwatch_metric_alarm" "memory_util" {
 resource "aws_cloudwatch_event_rule" "task_stopped" {
   count = var.task_stopped_event_target_arn == null ? 0 : 1
 
-  name        = "event-${aws_ecs_cluster.cluster.name}-task-stopped"
+  name        = "event-ecs-cls-${aws_ecs_cluster.cluster.name}-task-stopped"
   description = "A ECS task stopped in ECS cluster '${aws_ecs_cluster.cluster.name}'"
 
   event_pattern = jsonencode({

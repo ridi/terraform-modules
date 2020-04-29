@@ -70,11 +70,9 @@ module "service" {
 ## Input Variables
 
 ### ECS Cluster
-
 - `cluster_name` - The name of ECS cluster to deploy ECS service on
 
 ### ECS Service
-
 - `service_name` - The name of this ECS service
 - `launch_type` - The launch type on which to run your service. ('EC2' or 'FARGATE')
 - `task_definition_arn` - The arn of task definition. If not set, creates new one. (container_definitions is required)
@@ -87,7 +85,6 @@ module "service" {
 - `load_balancers` - The list of load balancer associations `[{ target_group_arn, container_name, container_port }]`
 
 ### ECS Task Definition
-
 These variables are ignored if `task_definition_arn` is set
 
 - `task_cpu` - The number of cpu units used by the task. (used in Fargate)
@@ -97,3 +94,10 @@ These variables are ignored if `task_definition_arn` is set
 - `iam_exec_role_arn` - The ARN of IAM role to execute ECS task
 - `volumes` - The list of Docker volume definition
 - `container_definitions` - The definitions of each container. (See https://docs.aws.amazon.com/ko_kr/AmazonECS/latest/developerguide/create-task-definition.html)
+
+### CloudWatch
+- `metrix_alarm_actions`: The actions of CloudWatch metrix alarm
+- `metrix_alarm_memory_util_threshold`: The threshold of memory utilization CloudWatch metrix alarm
+- `metrix_alarm_memory_util_period`: The period of memory utilization CloudWatch metrix alarm
+- `metrix_alarm_cpu_util_threshold`: The threshold of CPU utilization CloudWatch metrix alarm
+- `metrix_alarm_cpu_util_period`: The period of CPU utilization CloudWatch metrix alarm

@@ -98,12 +98,6 @@ variable "instance_user_data" {
   default     = null
 }
 
-variable "metrix_alarm_actions" {
-  description = "The actions of CloudWatch metrix alarm"
-  type        = list(string)
-  default     = []
-}
-
 variable "iam_instance_profile" {
   description = "The instance profile. If not set, creates new one"
   default     = null
@@ -115,10 +109,16 @@ variable "iam_instance_role_policy_arns" {
   default     = []
 }
 
+variable "metrix_alarm_actions" {
+  description = "The actions of CloudWatch metrix alarm"
+  type        = list(string)
+  default     = []
+}
+
 variable "metrix_alarm_memory_util_threshold" {
   description = "The threshold of memory utilization CloudWatch metrix alarm"
   type        = number
-  default     = 70
+  default     = 80
 }
 
 variable "metrix_alarm_memory_util_period" {
@@ -130,7 +130,7 @@ variable "metrix_alarm_memory_util_period" {
 variable "metrix_alarm_cpu_util_threshold" {
   description = "The threshold of CPU utilization CloudWatch metrix alarm"
   type        = number
-  default     = 70
+  default     = 80
 }
 
 variable "metrix_alarm_cpu_util_period" {
