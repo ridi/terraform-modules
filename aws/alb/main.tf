@@ -32,6 +32,7 @@ locals {
     name => {
       lambda_func_name = target_group.lambda_func_name
       lambda_arn       = target_group.lambda_arn
+      lambda_qualifier = lookup(target_group, "lambda_qualifier", null)
     } if target_group.type == "lambda"
   }
 
@@ -165,13 +166,14 @@ resource "aws_lambda_permission" "lambda" {
   action        = "lambda:InvokeFunction"
   source_arn    = aws_alb_target_group.this[each.key].arn
   function_name = each.value.lambda_func_name
+  qualifier     = each.value.lambda_qualifier
 }
 
 resource "aws_alb_target_group_attachment" "lambda" {
   for_each = local.lambda_target_groups
 
   target_group_arn = aws_alb_target_group.this[each.key].arn
-  target_id        = each.value.lambda_arn
+  target_id        = each.value.lambda_qualifier == null ? each.value.lambda_arn : "${each.value.lambda_arn}:${each.value.lambda_qualifier}"
 
   depends_on = [aws_lambda_permission.lambda]
 }
