@@ -19,6 +19,7 @@ module "alb" {
       type             = "lambda"
       lambda_func_name = data.aws_lambda_function.my_lambda.function_name
       lambda_arn       = data.aws_lambda_function.my_lambda.arn
+      lambda_qualifier = data.aws_lambda_function.my_lambda.qualifier
       health_check     = { enabled = false }
       http5xx_alarm    = { threshold = 5, period = 600, evaluation_periods = 1 }
     },
@@ -144,6 +145,7 @@ module "alb" {
     type             = "lambda"
     lambda_func_name = string
     lambda_arn       = string
+    lambda_qualifier = string (optional)
     health_check = { (optional)
       enabled             = bool (default = true)
       healthy_threshold   = number (default = 2)
