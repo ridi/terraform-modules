@@ -288,6 +288,7 @@ resource "aws_cloudwatch_metric_alarm" "unhealty_host" {
 
   actions_enabled = true
   alarm_actions   = var.metrix_alarm_actions
+  ok_actions      = var.metrix_alarm_actions
 }
 
 resource "aws_cloudwatch_metric_alarm" "http5xx" {
@@ -314,4 +315,5 @@ resource "aws_cloudwatch_metric_alarm" "http5xx" {
 
   actions_enabled = true
   alarm_actions   = var.metrix_alarm_actions
+  ok_actions      = var.metrix_alarm_actions
 }
