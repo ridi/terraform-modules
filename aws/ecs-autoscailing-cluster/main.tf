@@ -61,6 +61,12 @@ resource "aws_launch_configuration" "instance" {
 
   user_data_base64 = data.template_cloudinit_config.instance.rendered
 
+  root_block_device {
+    volume_size           = var.instance_volume_size
+    volume_type           = var.instance_volume_type
+    delete_on_termination = true
+  }
+
   lifecycle {
     create_before_destroy = true
   }

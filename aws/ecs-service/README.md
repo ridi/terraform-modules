@@ -75,7 +75,7 @@ module "service" {
 ### ECS Service
 - `service_name` - The name of this ECS service
 - `launch_type` - The launch type on which to run your service. ('EC2' or 'FARGATE')
-- `task_definition_arn` - The arn of task definition. If not set, creates new one. (container_definitions is required)
+- `task_definition_arn` - The arn of task definition. If not set, creates new one. (requires `container_definitions`)
 - `task_num` - The number of tasks to be deployed
 - `deployment_min_percent` - The lower limit of tasks as a percentage
 - `deployment_max_percent` - The upper limit of tasks as a percentage

@@ -82,6 +82,12 @@ variable "instance_volume_size" {
   default     = 30
 }
 
+variable "instance_volume_type" {
+  description = "The type of the autoscale instance volume"
+  type        = string
+  default     = "gp2"
+}
+
 variable "instance_security_group_ids" {
   description = "The list of security group ids to associate with autoscale instances"
   type        = list(string)

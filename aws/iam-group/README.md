@@ -24,7 +24,7 @@ module "some_group" {
           Effect    = "Allow"
           Action = [
             "s3:PutObject",
-            "s3:GetObject"
+            "s3:GetObject",
           ],
           Resource = [
             "arn:aws:s3:::group-bucket/*"

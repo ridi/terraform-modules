@@ -8,6 +8,9 @@ The modules were implemented with latest Terraform syntax. The minimum Terraform
 ### ALB
 - [alb](aws/alb)
 
+### EC2
+- [ec2-instance](aws/ec2-instance)
+
 ### ECS
 - [ecr](aws/ecr)
 - [ecs-autoscailing-cluster](aws/ecs-autoscailing-cluster)

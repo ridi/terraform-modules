@@ -23,7 +23,7 @@ resource "aws_iam_role" "this" {
         Effect = "Allow"
         Principal = {
           Service = "events.amazonaws.com"
-        },
+        }
         Action = "sts:AssumeRole"
       }
     ]
@@ -39,14 +39,14 @@ resource "aws_iam_policy" "this" {
     Version = "2012-10-17"
     Statement = [
       {
-        Effect   = "Allow",
-        Action   = "iam:PassRole",
-        Resource = "*",
+        Effect   = "Allow"
+        Action   = "iam:PassRole"
+        Resource = "*"
       },
       {
-        Effect   = "Allow",
-        Action   = "ecs:RunTask",
-        Resource = var.task_definition_arn == null ? aws_ecs_task_definition.this.*.arn[0] : var.task_definition_arn,
+        Effect   = "Allow"
+        Action   = "ecs:RunTask"
+        Resource = var.task_definition_arn == null ? aws_ecs_task_definition.this.*.arn[0] : var.task_definition_arn
       }
     ]
   })

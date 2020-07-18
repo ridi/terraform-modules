@@ -67,7 +67,7 @@ module "scheduled_task" {
 - `awsvpc_subnet_ids` - The subnets associated with the task or service (task_network_mode)
 - `awsvpc_security_groups` - The security groups associated with the task or service
 - `awsvpc_assign_public_ip` - Whether assigns a public IP address to the ENI or not
-- `task_definition_arn` - The arn of task definition. If not set, creates new one. (container_definitions is required)
+- `task_definition_arn` - The arn of task definition. If not set, creates new one. (requires `container_definitions`)
 - `task_num` - The number of tasks to be deployed
 - `container_overrides` - The definition override of containers. `[{ name = 'name-of-container-to-override', 'key-to-override' = 'value', ... }, {...}]`
 

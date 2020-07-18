@@ -32,7 +32,7 @@ variable "launch_type" {
 }
 
 variable "task_definition_arn" {
-  description = "The arn of task definition. If not set, creates new one. (container_definitions is required)"
+  description = "The arn of task definition. If not set, creates new one. (requires `container_definitions`)"
   type        = string
   default     = null
 }
