@@ -31,7 +31,7 @@ module "instance" {
 ## Input Variables
 
 ### Common
-- `name`:
+- `name`: The keyword name of resources
 - `tags`: The tags to assign to all resources
 
 ### VPC

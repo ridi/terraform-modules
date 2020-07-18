@@ -101,21 +101,17 @@ module "alb" {
 ## Input Variables
 
 ### Common
-
 - `tags`: The tags to assign to all resources
 
 ### VPC
-
 - `vpc_id`: The ID of VPC where default target groups are created
 - `subnet_ids`: The ID of subnets where ALB is created
 - `security_group_ids`: The ID of security groups of ALB
 
 ### ALB
-
 - `name`: The name of ALB
 
 - `target_groups`: The config values for multiple target groups in form of the below
-
 ```hcl
 {
   # Instance type
@@ -166,7 +162,6 @@ module "alb" {
 ```
 
 - `listeners`: The config values for multiple listeners and listener rules in form of the below
-
 ```hcl
 listeners = {
   80 (port number) = {
