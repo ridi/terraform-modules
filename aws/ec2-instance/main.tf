@@ -178,7 +178,21 @@ resource "aws_iam_policy" "ssm" {
           "ssmmessages:OpenDataChannel",
         ]
         Resource = "*"
-      }
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:GetEncryptionConfiguration"
+        ]
+        Resource = "*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "kms:Decrypt"
+        ]
+        Resource = "*"
+      },
     ]
   })
 }
