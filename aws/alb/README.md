@@ -35,10 +35,12 @@ module "alb" {
     80 = {
       protocol = "HTTP"
       default_action = {
-        type        = "redirect"
-        protocol    = "HTTPS"
-        port        = 443
-        status_code = 301
+        type = "redirect"
+        redirect = {
+          protocol    = "HTTPS"
+          port        = 443
+          status_code = 301
+        }
       }
     },
     443 = {
@@ -48,7 +50,9 @@ module "alb" {
       rules = {
         robots = {
           priority  = 1
-          condition = { path-pattern = ["/robots.txt"] }
+          condition = {
+            path_pattern = { values = ["/robots.txt"] }
+          }
           action = {
             type           = "fixed-response"
             fixed_response = {
