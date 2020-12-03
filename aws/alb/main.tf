@@ -107,7 +107,7 @@ resource "aws_alb_listener" "this" {
       for_each = (each.value.default_action.type == "fixed-response" ? [each.value.default_action.fixed_response] : [])
       content {
         content_type = lookup(fixed_response.value, "content_type", "text/plain")
-        message_body = lookup(fixed_response.value, "messasge_body", "")
+        message_body = lookup(fixed_response.value, "message_body", "")
         status_code  = lookup(fixed_response.value, "status_code", "200")
       }
     }
@@ -134,10 +134,10 @@ resource "aws_alb_target_group" "this" {
   target_type          = lookup(each.value, "type", "instance")
   deregistration_delay = 30
 
-  # instance type only options
-  vpc_id   = lookup(each.value, "type", "instance") == "instance" ? var.vpc_id : null
-  protocol = lookup(each.value, "type", "instance") == "instance" ? lookup(each.value, "protocol", "HTTP") : null
-  port     = lookup(each.value, "type", "instance") == "instance" ? lookup(each.value, "port", 80) : null
+  # non-lambda type only options
+  vpc_id   = lookup(each.value, "type", "instance") != "lambda" ? var.vpc_id : null
+  protocol = lookup(each.value, "type", "instance") != "lambda" ? lookup(each.value, "protocol", "HTTP") : null
+  port     = lookup(each.value, "type", "instance") != "lambda" ? lookup(each.value, "port", 80) : null
 
   dynamic "health_check" {
     for_each = lookup(each.value, "health_check", false) == false ? [] : [each.value.health_check]
