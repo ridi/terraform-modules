@@ -220,11 +220,13 @@ listeners = {
 ```
 
 ### S3
-
 - `log_enable`: Write ALB log to S3 bucket
 - `log_bucket`: The name of S3 bucket for logging
 - `log_bucket_prefix`: The prefix of log data on S3 bucket
 
 ### CloudWatch
-
 - `metrix_alarm_actions`: The actions of CloudWatch metrix alarm
+
+## Outputs
+- `alb_target_group_arns`: The ARN of target groups 
+- `alb_dns_name`: The DNS name of ALB
