@@ -267,7 +267,7 @@ resource "aws_alb_listener_rule" "this" {
 # CloudWatch metric alarms
 # ------------------------
 resource "aws_cloudwatch_metric_alarm" "unhealty_host" {
-  for_each = length(var.metrix_alarm_actions) > 0 ? local.health_checking_target_groups : {}
+  for_each = length(var.metric_alarm_actions) > 0 ? local.health_checking_target_groups : {}
 
   alarm_description = "The unhealthy host count of target group '${each.key}'"
 
@@ -287,12 +287,12 @@ resource "aws_cloudwatch_metric_alarm" "unhealty_host" {
   }
 
   actions_enabled = true
-  alarm_actions   = var.metrix_alarm_actions
-  ok_actions      = var.metrix_alarm_actions
+  alarm_actions   = var.metric_alarm_actions
+  ok_actions      = var.metric_alarm_actions
 }
 
 resource "aws_cloudwatch_metric_alarm" "http5xx" {
-  for_each = length(var.metrix_alarm_actions) > 0 ? local.http5xx_alarm_target_groups : {}
+  for_each = length(var.metric_alarm_actions) > 0 ? local.http5xx_alarm_target_groups : {}
 
   alarm_description = "The count of http 5xx response from target group '${each.key}'"
 
@@ -314,6 +314,6 @@ resource "aws_cloudwatch_metric_alarm" "http5xx" {
   }
 
   actions_enabled = true
-  alarm_actions   = var.metrix_alarm_actions
-  ok_actions      = var.metrix_alarm_actions
+  alarm_actions   = var.metric_alarm_actions
+  ok_actions      = var.metric_alarm_actions
 }

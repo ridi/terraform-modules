@@ -133,8 +133,8 @@ variable "listeners" {
   default = {}
 }
 
-variable "metrix_alarm_actions" {
-  description = "The actions of CloudWatch metrix alarm"
+variable "metric_alarm_actions" {
+  description = "The actions of CloudWatch metric alarm"
   type        = list(string)
   default     = []
 }

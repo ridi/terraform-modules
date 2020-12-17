@@ -225,7 +225,7 @@ listeners = {
 - `log_bucket_prefix`: The prefix of log data on S3 bucket
 
 ### CloudWatch
-- `metrix_alarm_actions`: The actions of CloudWatch metrix alarm
+- `metric_alarm_actions`: The actions of CloudWatch metric alarm
 
 ## Outputs
 - `alb_target_group_arns`: The ARN of target groups 

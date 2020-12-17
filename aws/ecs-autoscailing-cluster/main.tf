@@ -185,7 +185,7 @@ resource "aws_iam_role_policy_attachment" "instance_additional" {
 # CloudWatch Metric Alarms
 # ------------------------
 resource "aws_cloudwatch_metric_alarm" "cpu_util" {
-  count = length(var.metrix_alarm_actions) > 0 ? 1 : 0
+  count = length(var.metric_alarm_actions) > 0 ? 1 : 0
 
   alarm_name        = "alarm-ecs-cls-${aws_ecs_cluster.cluster.name}-cpu-util"
   alarm_description = "The CPU utilization of ECS cluster '${aws_ecs_cluster.cluster.name}'"
@@ -195,8 +195,8 @@ resource "aws_cloudwatch_metric_alarm" "cpu_util" {
 
   comparison_operator = "GreaterThanOrEqualToThreshold"
   statistic           = "Maximum"
-  threshold           = var.metrix_alarm_cpu_util_threshold
-  period              = var.metrix_alarm_cpu_util_period
+  threshold           = var.metric_alarm_cpu_util_threshold
+  period              = var.metric_alarm_cpu_util_period
   evaluation_periods  = 1
 
   dimensions = {
@@ -204,11 +204,11 @@ resource "aws_cloudwatch_metric_alarm" "cpu_util" {
   }
 
   actions_enabled = true
-  alarm_actions   = var.metrix_alarm_actions
+  alarm_actions   = var.metric_alarm_actions
 }
 
 resource "aws_cloudwatch_metric_alarm" "memory_util" {
-  count = length(var.metrix_alarm_actions) > 0 ? 1 : 0
+  count = length(var.metric_alarm_actions) > 0 ? 1 : 0
 
   alarm_name        = "alarm-ecs-cls-${aws_ecs_cluster.cluster.name}-mem-util"
   alarm_description = "The memory utilization of ECS cluster '${aws_ecs_cluster.cluster.name}'"
@@ -218,8 +218,8 @@ resource "aws_cloudwatch_metric_alarm" "memory_util" {
 
   comparison_operator = "GreaterThanOrEqualToThreshold"
   statistic           = "Maximum"
-  threshold           = var.metrix_alarm_memory_util_threshold
-  period              = var.metrix_alarm_memory_util_period
+  threshold           = var.metric_alarm_memory_util_threshold
+  period              = var.metric_alarm_memory_util_period
   evaluation_periods  = 1
 
   dimensions = {
@@ -227,7 +227,7 @@ resource "aws_cloudwatch_metric_alarm" "memory_util" {
   }
 
   actions_enabled = true
-  alarm_actions   = var.metrix_alarm_actions
+  alarm_actions   = var.metric_alarm_actions
 }
 
 # ------------------------

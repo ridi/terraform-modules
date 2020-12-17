@@ -96,8 +96,8 @@ These variables are ignored if `task_definition_arn` is set
 - `container_definitions` - The definitions of each container. (See https://docs.aws.amazon.com/ko_kr/AmazonECS/latest/developerguide/create-task-definition.html)
 
 ### CloudWatch
-- `metrix_alarm_actions`: The actions of CloudWatch metrix alarm
-- `metrix_alarm_memory_util_threshold`: The threshold of memory utilization CloudWatch metrix alarm
-- `metrix_alarm_memory_util_period`: The period of memory utilization CloudWatch metrix alarm
-- `metrix_alarm_cpu_util_threshold`: The threshold of CPU utilization CloudWatch metrix alarm
-- `metrix_alarm_cpu_util_period`: The period of CPU utilization CloudWatch metrix alarm
+- `metric_alarm_actions`: The actions of CloudWatch metric alarm
+- `metric_alarm_memory_util_threshold`: The threshold of memory utilization CloudWatch metric alarm
+- `metric_alarm_memory_util_period`: The period of memory utilization CloudWatch metric alarm
+- `metric_alarm_cpu_util_threshold`: The threshold of CPU utilization CloudWatch metric alarm
+- `metric_alarm_cpu_util_period`: The period of CPU utilization CloudWatch metric alarm
