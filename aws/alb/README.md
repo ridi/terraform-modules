@@ -56,9 +56,9 @@ module "alb" {
           action = {
             type           = "fixed-response"
             fixed_response = {
-                content_type = "text/plain"
-                message_body = "User-agent: *\nDisallow: /\n"
-                status_code  = "200"
+              content_type = "text/plain"
+              message_body = "User-agent: *\nDisallow: /\n"
+              status_code  = "200"
             }
           }
         },
@@ -78,23 +78,23 @@ module "alb" {
           condition = {
             host-header  = { values = ["api.my-service.com"] }
             path-pattern = { values = ["/bar/*"] }
-          action = {
-            type = "forward"
-            target_group_name = "instance-api"
-          }
-        },
-      }
-
-      default_action = {
-        type = "redirect"
-        redirect = {
-          protocol    = "HTTPS"
-          port        = 443
-          host        = "my-service.com"
-          path        = "/error/400"
-          query       = ""
-          status_code = 302
+            action = {
+              type = "forward"
+              target_group_name = "instance-api"
+            }
+          },
         }
+
+        default_action = {
+          type = "redirect"
+          redirect = {
+            protocol    = "HTTPS"
+            port        = 443
+            host        = "my-service.com"
+            path        = "/error/400"
+            query       = ""
+            status_code = 302
+          }
         }
       }
     },
@@ -158,9 +158,15 @@ module "alb" {
     http5xx_alarm = { (optional)
       enabled            = bool (default = true)
       threshold          = number (default = 0)
-      period             = number (default = 300)
+      period             = number (default = 60)
       evaluation_periods = number (default = 1)
     }
+    response_time_alarm  = object({ (optional)
+      enabled            = bool (default = true)
+      threshold          = number (default = 5)
+      period             = number (default = 60)
+      evaluation_periods = number (default = 1)
+    })
   }
 }
 ```

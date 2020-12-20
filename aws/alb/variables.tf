@@ -64,7 +64,8 @@ variable "target_groups" {
   #     type              = "lambda"
   #     lambda_func_name  = string
   #     lambda_arn        = string
-  #     health_check = object({ (optional)
+  #
+  #     health_check          = object({ (optional)
   #       enabled             = bool (default = true)
   #       healthy_threshold   = number (default = 2)
   #       interval            = number (default = 10)
@@ -73,10 +74,18 @@ variable "target_groups" {
   #       timeout             = number (default = 5)
   #       unhealthy_threshold = number (default = 5)
   #     })
-  #     http5xx_alarm = object({ (optional)
+  #
+  #     http5xx_alarm        = object({ (optional)
   #       enabled            = bool (default = true)
   #       threshold          = number (default = 0)
-  #       period             = number (default = 300)
+  #       period             = number (default = 60)
+  #       evaluation_periods = number (default = 1)
+  #     })
+  #
+  #     response_time_alarm  = object({ (optional)
+  #       enabled            = bool (default = true)
+  #       threshold          = number (default = 5)
+  #       period             = number (default = 60)
   #       evaluation_periods = number (default = 1)
   #     })
   # })

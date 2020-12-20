@@ -46,9 +46,18 @@ locals {
   http5xx_alarm_target_groups = { for name, target_group in var.target_groups :
     name => {
       threshold          = lookup(target_group.http5xx_alarm, "threshold", 0)
-      period             = lookup(target_group.http5xx_alarm, "period", 300)
+      period             = lookup(target_group.http5xx_alarm, "period", 60)
       evaluation_periods = lookup(target_group.http5xx_alarm, "evaluation_periods", 1)
     } if lookup(lookup(target_group, "http5xx_alarm", {}), "enabled", true)
+  }
+
+  # { target_group_name => response_time_alarm_options }
+  response_time_alarm_target_groups = { for name, target_group in var.target_groups :
+    name => {
+      threshold          = lookup(target_group.response_time_alarm, "threshold", 5)
+      period             = lookup(target_group.response_time_alarm, "period", 60)
+      evaluation_periods = lookup(target_group.response_time_alarm, "evaluation_periods", 1)
+    } if lookup(lookup(target_group, "response_time_alarm", {}), "enabled", true)
   }
 }
 
@@ -134,7 +143,7 @@ resource "aws_alb_target_group" "this" {
   target_type          = lookup(each.value, "type", "instance")
   deregistration_delay = 30
 
-  # non-lambda type only options
+  # non-lambda options
   vpc_id   = lookup(each.value, "type", "instance") != "lambda" ? var.vpc_id : null
   protocol = lookup(each.value, "type", "instance") != "lambda" ? lookup(each.value, "protocol", "HTTP") : null
   port     = lookup(each.value, "type", "instance") != "lambda" ? lookup(each.value, "port", 80) : null
@@ -271,7 +280,7 @@ resource "aws_cloudwatch_metric_alarm" "unhealty_host" {
 
   alarm_description = "The unhealthy host count of target group '${each.key}'"
 
-  alarm_name  = "alarm-${each.key}-unhealthy-host"
+  alarm_name  = "alarm-tg-${each.key}-unhealthy-host"
   namespace   = "AWS/ApplicationELB"
   metric_name = "UnHealthyHostCount"
 
@@ -296,11 +305,38 @@ resource "aws_cloudwatch_metric_alarm" "http5xx" {
 
   alarm_description = "The count of http 5xx response from target group '${each.key}'"
 
-  alarm_name  = "alarm-${each.key}-target-5xx-count"
+  alarm_name  = "alarm-tg-${each.key}-5xx-count"
   namespace   = "AWS/ApplicationELB"
   metric_name = "HTTPCode_Target_5XX_Count"
 
   statistic           = "Sum"
+  treat_missing_data  = "notBreaching"
+  comparison_operator = "GreaterThanThreshold"
+
+  threshold          = each.value.threshold
+  period             = each.value.period
+  evaluation_periods = each.value.evaluation_periods
+
+  dimensions = {
+    LoadBalancer = aws_alb.this.arn_suffix
+    TargetGroup  = aws_alb_target_group.this[each.key].arn_suffix
+  }
+
+  actions_enabled = true
+  alarm_actions   = var.metric_alarm_actions
+  ok_actions      = var.metric_alarm_actions
+}
+
+resource "aws_cloudwatch_metric_alarm" "response_time" {
+  for_each = length(var.metric_alarm_actions) > 0 ? local.response_time_alarm_target_groups : {}
+
+  alarm_description = "The response time from target group '${each.key}'"
+
+  alarm_name  = "alarm-tg-${each.key}-response-time"
+  namespace   = "AWS/ApplicationELB"
+  metric_name = "TargetResponseTime"
+
+  statistic           = "Maximum"
   treat_missing_data  = "notBreaching"
   comparison_operator = "GreaterThanThreshold"
 
