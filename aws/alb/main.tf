@@ -45,18 +45,18 @@ locals {
   # { target_group_name => http5xx_alarm_options }
   http5xx_alarm_target_groups = { for name, target_group in var.target_groups :
     name => {
-      threshold          = lookup(target_group.http5xx_alarm, "threshold", 0)
-      period             = lookup(target_group.http5xx_alarm, "period", 60)
-      evaluation_periods = lookup(target_group.http5xx_alarm, "evaluation_periods", 1)
+      threshold          = lookup(lookup(target_group, "http5xx_alarm", {}), "threshold", 0)
+      period             = lookup(lookup(target_group, "http5xx_alarm", {}), "period", 60)
+      evaluation_periods = lookup(lookup(target_group, "http5xx_alarm", {}), "evaluation_periods", 1)
     } if lookup(lookup(target_group, "http5xx_alarm", {}), "enabled", true)
   }
 
   # { target_group_name => response_time_alarm_options }
   response_time_alarm_target_groups = { for name, target_group in var.target_groups :
     name => {
-      threshold          = lookup(target_group.response_time_alarm, "threshold", 5)
-      period             = lookup(target_group.response_time_alarm, "period", 60)
-      evaluation_periods = lookup(target_group.response_time_alarm, "evaluation_periods", 1)
+      threshold          = lookup(lookup(target_group, "response_time_alarm", {}), "threshold", 5)
+      period             = lookup(lookup(target_group, "response_time_alarm", {}), "period", 60)
+      evaluation_periods = lookup(lookup(target_group, "response_time_alarm", {}), "evaluation_periods", 1)
     } if lookup(lookup(target_group, "response_time_alarm", {}), "enabled", true)
   }
 }
