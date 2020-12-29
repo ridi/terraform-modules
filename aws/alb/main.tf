@@ -3,14 +3,12 @@ locals {
   listener_certs = { for listener_cert in flatten([for port, listener in var.listeners :
     [for index, cert_arn in lookup(listener, "cert_arns", []) :
       {
-        name = "${port}-${index}"
+        name = index
         port = port
         arn  = cert_arn
       }
     ]
-    ]) :
-    listener_cert.name => listener_cert
-  }
+  ]) : "${listener_cert.port}-${listener_cert.name}" => listener_cert}
 
   # { listener_rule_name => listener_rule_oprions }
   listener_rules = { for listener_rule in flatten([for port, listener in var.listeners :
@@ -23,9 +21,7 @@ locals {
         action    = rule.action
       }
     ]
-    ]) :
-    listener_rule.name => listener_rule
-  }
+  ]) : "${listener_rule.port}-${listener_rule.name}" => listener_rule}
 
   # { target_group_name => lambda_options }
   lambda_target_groups = { for name, target_group in var.target_groups :
