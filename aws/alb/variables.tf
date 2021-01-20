@@ -6,6 +6,12 @@ variable "name" {
   description = "The name of ALB"
 }
 
+variable "idle_timeout" {
+  description = "The idle timeout of ALB"
+  type        = number
+  default     = 60
+}
+
 variable "vpc_id" {
   description = "The ID of VPC where default target groups are created"
 }

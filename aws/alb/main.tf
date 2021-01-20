@@ -65,6 +65,7 @@ resource "aws_alb" "this" {
   subnets         = var.subnet_ids
   security_groups = var.security_group_ids
   internal        = false
+  idle_timeout    = var.idle_timeout
 
   dynamic "access_logs" {
     for_each = (var.log_bucket == null ? [] : [var.log_bucket])
